@@ -24,7 +24,7 @@ setup(
     name='blackgate',
     version='0.1.0',
     license='MIT',
-    description="A set of utility to build API gateway.",
+    description="A set of utilities to build API gateway.",
     long_description=readme + '\n\n' + history,
     zip_safe=False,
     include_package_data=True,
