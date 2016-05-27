@@ -65,36 +65,28 @@ Configure Blackgate Component::
 
 Route User Request to Inner Service::
 
-    from gateway.core import Command
+    from blackgate import HTTPProxyCommand
 
-    class APIService(Command):
+    class APIService(HTTPProxyCommand):
 
-        group_key = 'api.v1'
-        command_key = '*'
-        host = 'localhost:5000'
+        group_key = 'api.v2'
 
-        def __init__(self, request):
-            self.request = request
+        command_key = ''
 
-        def build_url(self, path):
-            path = path[4:]
-            return 'http://' + self.host + path
+        def before_request(self):
+            path = self.request['path'].replace('/api', '')
+            self.request['url'] = 'http://intra.service.com' + path
 
-        def run(self):
-            conn = self.connection_pool.get_connection(self.host)
-            req = dict(
-                method=self.request['method'],
-                url=self.build_url(self.request['path']),
-                data=self.request['data'],
-                params=self.request['params'],
-                headers=self.request['headers'],
-            )
-            resp = conn.request(**req)
+        def fallback(self):
             return dict(
-                status_code=resp.status_code,
-                reason=resp.reason,
-                headers=dict(resp.headers),
-                content=resp.content
+                status_code=500,
+                reason='Internal Server Error',
+                headers={},
+                content=json.dumps({
+                    'code': 500,
+                    'message': 'internal server error',
+                    'error': {}
+                })
             )
 
 
