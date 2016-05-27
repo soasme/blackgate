@@ -21,7 +21,7 @@ class Command(object):
     def fallback(self):
         return
 
-    def submit(self):
+    def execute(self):
         # FIXME: define get_executor_pool for pools
         executor = pools.get_executor(self.group_key)
         # FIXME: limit executor queue length
