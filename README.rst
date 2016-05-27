@@ -1,8 +1,8 @@
 BLACKGATE
 =========
 
-Usage
------
+Usage: Proxy
+-------------
 
 Configure Blackgate Component::
 
