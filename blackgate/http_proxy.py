@@ -37,12 +37,15 @@ class HTTPProxy(web.RequestHandler):
 
     @gen.coroutine
     def _fetch(self, *args, **kwargs):
+        headers = dict(self.request.headers.get_all())
+        headers.pop('Host')
+        headers['User-Agent'] = 'Blackgate/0.1.0'
         request_data = dict(
             method=self.request.method,
             path=self.request.path,
             params=self.request.query_arguments,
             data=self.request.body,
-            headers=dict(self.request.headers.get_all())
+            headers=headers,
         )
         command = self.command(request_data)
         resp = yield command.execute()
@@ -56,6 +59,7 @@ class HTTPProxy(web.RequestHandler):
                     'Server',
                     'Content-Encoding',
                     'Content-Length',
+                    'Transfer-Encoding',
             }:
                 continue
 
