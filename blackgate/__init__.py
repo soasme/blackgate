@@ -9,3 +9,4 @@ __all__ = [
 from .core import component
 from .command import Command
 from .http_proxy import HTTPProxy
+from . import options
