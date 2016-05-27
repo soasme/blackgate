@@ -4,6 +4,15 @@ from concurrent.futures import ThreadPoolExecutor
 
 class ExecutorPools(object):
 
+    class PoolFull(Exception):
+        pass
+
+    class ExecutionTimeout(Exception):
+        pass
+
+    class ExecutionFailure(Exception):
+        pass
+
     def __init__(self):
         self.pools = {}
 
