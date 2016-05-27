@@ -96,3 +96,17 @@ Route User Request to Inner Service::
                 headers=dict(resp.headers),
                 content=resp.content
             )
+
+
+ThreadExecutorPool
+--------------------
+
+Executor Pool is the place where you can run external network calls.
+
+Each command defines its group_key.
+You must register an executor_pool for specific group_key::
+
+    from blackgate import component
+    component.add('executor_pool', {'group_key': 'service.session', 'max_workers', 10})
+    # ...
+    component.install()
