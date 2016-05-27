@@ -1,6 +1,54 @@
 BLACKGATE
 =========
 
+Usage: Define Command
+----------------------
+
+`Command` represents an external operation.
+To define a command, you must inherit from `blackgate.Command`.
+
+Example::
+
+
+    from blackgate import Command
+
+    class GetCurrentUser(Command):
+
+        group_key = 'service.session'
+        command_key = 'get_current_user'
+
+        def __init__(self, cookie):
+            self.cookie = cookie
+
+        def run(self):
+            resp = requests.get('http://session-service/session', headers={'Cookie': self.cookie}, timeout=1)
+            return resp.json()['user_id']
+
+        def fallback(self):
+            return None
+
+Usage: Synchronous Execution
+-----------------------------
+
+You can contruct command with parameters and then execute it::
+
+    get_current_user = GetCurrentUser(cookie='session=78b29404-92c9-49db-b87b-531b5f9cfc56')
+    user_id = get_current_user.execute()
+
+Usage: Asynchronous Execution
+------------------------------
+
+You can execute a Command asynchronously by using the queue() method, as in the following example::
+
+    @tornado.gen.coroutine
+    def some_function():
+        get_current_user = GetCurrentUser(cookie='session=78b29404-92c9-49db-b87b-531b5f9cfc56')
+        user_id = yield get_current_user.queue()
+        print(user_id)
+
+Usage: Fallback
+----------------
+
 Usage: Proxy
 -------------
 
