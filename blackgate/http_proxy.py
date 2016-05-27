@@ -38,7 +38,7 @@ class HTTPProxy(web.RequestHandler):
     @gen.coroutine
     def _fetch(self, *args, **kwargs):
         headers = dict(self.request.headers.get_all())
-        headers.pop('Host')
+        headers.pop('Host', None)
         headers['User-Agent'] = 'Blackgate/0.1.0'
         request_data = dict(
             method=self.request.method,
