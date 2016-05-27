@@ -4,13 +4,14 @@ from __future__ import absolute_import
 
 from .connection_pool import ConnectionPool
 
-# FIXME: declare pools
-from .core import pools
+from .core import component
 
 class Command(object):
 
     # FIXME: find a better way to declare group_key
-    group_key = None
+    group_key = 'default'
+
+    command_key = None
 
     # FIXME: find a better place to create connection pool
     connection_pool = ConnectionPool()
@@ -19,14 +20,30 @@ class Command(object):
         raise NotImplementedError
 
     def fallback(self):
-        return
+        raise NotImplementedError
 
     def execute(self):
-        # FIXME: define get_executor_pool for pools
-        executor = pools.get_executor(self.group_key)
-        # FIXME: limit executor queue length
+        # TODO: implement cache machenism.
+
+        if not component.circuit_beaker.is_allow_request(self.group_key, self.command_key):
+            return self.fallback()
+
+        executor = component.pools.get_executor(self.group_key)
+
         try:
             future = executor.submit(self.run)
-        except pools.CircuitBeakerRejectError:
+            component.circuit_beaker.report_success(self.group_key, self.command_key)
+
+        except component.pools.PoolFull:
             future = self.fallback()
+            component.circuit_beaker.report_reject(self.group_key, self.command_key)
+
+        except component.pools.ExecutionTimeout:
+            future = self.fallback()
+            component.circuit_beaker.report_timeout(self.group_key, self.command_key)
+
+        except component.pools.ExecutionFailure:
+            future = self.fallback()
+            component.circuit_beaker.report_failure(self.group_key, self.command_key)
+
         return future
