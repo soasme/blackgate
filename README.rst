@@ -69,9 +69,9 @@ Route User Request to Inner Service::
 
     class APIService(HTTPProxyCommand):
 
-        group_key = 'api.v2'
+        group_key = 'api.v1'
 
-        command_key = ''
+        command_key = 'proxy_v1_traffic'
 
         def before_request(self):
             path = self.request['path'].replace('/api', '')
