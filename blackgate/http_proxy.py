@@ -48,7 +48,7 @@ class HTTPProxy(web.RequestHandler):
             headers=headers,
         )
         command = self.command(request_data)
-        resp = yield command.execute()
+        resp = yield command.queue()
         self.write_resp(resp)
 
     def write_resp(self, resp):
