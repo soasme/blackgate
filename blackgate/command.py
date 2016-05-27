@@ -2,10 +2,15 @@
 
 from __future__ import absolute_import
 
+import logging
+
 import requests
+from tornado import gen
+from tornado.ioloop import IOLoop
 
 from .core import component
 
+logger = logging.getLogger(__name__)
 
 class Command(object):
 
@@ -20,31 +25,43 @@ class Command(object):
     def fallback(self):
         raise NotImplementedError
 
-    def execute(self):
+    @gen.coroutine
+    def queue(self):
         # TODO: implement cache machenism.
 
         if not component.circuit_beaker.is_allow_request(self.group_key, self.command_key):
-            return self.fallback()
+            future = self.fallback()
+            raise gen.Return(future)
 
         executor = component.pools.get_executor(self.group_key)
 
         try:
-            future = executor.submit(self.run)
+            future = yield executor.submit(self.run)
             component.circuit_beaker.report_success(self.group_key, self.command_key)
 
         except component.pools.PoolFull:
             future = self.fallback()
             component.circuit_beaker.report_reject(self.group_key, self.command_key)
+            logger.error('type: pool_full')
 
         except component.pools.ExecutionTimeout:
             future = self.fallback()
             component.circuit_beaker.report_timeout(self.group_key, self.command_key)
+            logger.error('type: execution_timeout')
 
-        except component.pools.ExecutionFailure:
+        except Exception as exception:
             future = self.fallback()
             component.circuit_beaker.report_failure(self.group_key, self.command_key)
+            logger.error('type: execution_fail, reason: %s', exception.message)
 
-        return future
+        raise gen.Return(future)
+
+    def execute(self):
+        try:
+            return self.run()
+        except Exception as exception:
+            logger.error('type: execution_fail, reason: %s', exception.message)
+            return self.fallback()
 
 
 class HTTPProxyCommand(Command):
