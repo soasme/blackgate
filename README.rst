@@ -4,14 +4,26 @@ BLACKGATE
 Usage
 -----
 
+Configure Blackgate Component::
+
+    from blackgate import component
+    component.add('executor_pool', {'group_key': 'api.v1', 'max_workers': 10})
+    component.install()
+    app = tornado.web.Application([
+      (r'/api/v1/(.*)', HTTPProxy, dict(command=APIV1Command)),
+    ])
+    app.listen(8888)
+    tornado.ioloop.IOLoop.current().start()
+
 Route User Request to Inner Service::
 
-    from gateway.core import pools, Command
+    from gateway.core import Command
 
     class APIService(Command):
 
         group_key = 'api.v1'
-        host = 'x:5000'
+        command_key = '*'
+        host = 'localhost:5000'
 
         def __init__(self, request):
             self.request = request
@@ -36,14 +48,3 @@ Route User Request to Inner Service::
                 headers=dict(resp.headers),
                 content=resp.content
             )
-
-Add HTTPProxy Handler to tornado.web.Application::
-
-
-    pools.register_pool('api.v1')
-    urls = [
-        (r'/api/v1/(.*)', HTTPProxy, dict(service=APIService)),
-    ]
-    app = tornado.web.Application(urls)
-    app.listen(8888)
-    tornado.ioloop.IOLoop.current().start()
