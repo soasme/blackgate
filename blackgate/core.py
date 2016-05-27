@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from .executor_pools import ExecutorPools
+from .component import Component
 
-pools = ExecutorPools()
+component = Component()
