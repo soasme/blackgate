@@ -2,9 +2,10 @@
 
 from __future__ import absolute_import
 
-from .connection_pool import ConnectionPool
+import requests
 
 from .core import component
+
 
 class Command(object):
 
@@ -12,9 +13,6 @@ class Command(object):
     group_key = 'default'
 
     command_key = None
-
-    # FIXME: find a better place to create connection pool
-    connection_pool = ConnectionPool()
 
     def run(self):
         raise NotImplementedError
@@ -47,3 +45,35 @@ class Command(object):
             component.circuit_beaker.report_failure(self.group_key, self.command_key)
 
         return future
+
+
+class HTTPProxyCommand(Command):
+
+    def __init__(self, request):
+        self.request = request
+        self.response = {}
+
+    def before_request(self):
+        return
+
+    def after_response(self):
+        return
+
+    def run(self):
+        session = requests.Session()
+        self.before_request()
+        resp = session.request(
+            method=self.request['method'].upper(),
+            url=self.request['url'],
+            params=self.request['params'],
+            data=self.request['data'],
+            headers=self.request['headers'],
+        )
+        self.response = dict(
+            status_code=resp.status_code,
+            reason=resp.reason,
+            headers=dict(resp.headers),
+            content=resp.content
+        )
+        self.after_response()
+        return self.response
