@@ -4,8 +4,8 @@ from tornado import gen, web
 
 class HTTPProxy(web.RequestHandler):
 
-    def initialize(self, service):
-        self.service = service
+    def initialize(self, command):
+        self.command= command
 
     @gen.coroutine
     def get(self, *args, **kwargs):
@@ -44,8 +44,8 @@ class HTTPProxy(web.RequestHandler):
             data=self.request.body,
             headers=dict(self.request.headers.get_all())
         )
-        service = self.service(request_data)
-        resp = yield service.submit()
+        command = self.command(request_data)
+        resp = yield command.execute()
         self.write_resp(resp)
 
     def write_resp(self, resp):
