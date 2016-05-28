@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from .executor_pools  import ExecutorPools
-from .circuit_beaker import NoCircuitBeaker, InProcessCircuitBeaker
+from functools import partial
+
+from blackgate.executor_pools  import ExecutorPools
+from blackgate.circuit_beaker import NoCircuitBeaker, InProcessCircuitBeaker, get_circuit_beaker
 
 class Component(object):
 
@@ -10,6 +12,10 @@ class Component(object):
         self.circuit_beakers = {}
         self.circuit_beaker_impl = NoCircuitBeaker
         self.circuit_beaker_options = {}
+        self.get_circuit_beaker = partial(
+            get_circuit_beaker,
+            table=self.circuit_beakers,
+        )
         self.configurations = {}
 
     def set(self, key, value):

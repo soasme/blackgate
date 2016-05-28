@@ -77,7 +77,7 @@ class InProcessCircuitBeaker(CircuitBeaker):
 
 
 
-def get_circuit_beaker(table, command_key, group_key, impl=InProcessCircuitBeaker, **kwargs):
+def get_circuit_beaker(table, command_key, group_key, impl=InProcessCircuitBeaker, **options):
     """
     :param table: dict.
     :param command_key: string, Command Key.
@@ -87,6 +87,6 @@ def get_circuit_beaker(table, command_key, group_key, impl=InProcessCircuitBeake
     if command_key in table:
         return table[command_key]
 
-    table[command_key] = impl(command_key, group_key, **kwargs)
+    table[command_key] = impl(command_key, group_key, **options)
 
     return table[command_key]
