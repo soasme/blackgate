@@ -37,21 +37,21 @@ class Command(object):
 
         try:
             future = yield executor.submit(self.run)
-            component.circuit_beaker.report_success(self.group_key, self.command_key)
+            component.circuit_beaker.mark_success(self.group_key, self.command_key)
 
         except component.pools.PoolFull:
             future = self.fallback()
-            component.circuit_beaker.report_reject(self.group_key, self.command_key)
+            component.circuit_beaker.mark_reject(self.group_key, self.command_key)
             logger.error('type: pool_full')
 
         except component.pools.ExecutionTimeout:
             future = self.fallback()
-            component.circuit_beaker.report_timeout(self.group_key, self.command_key)
+            component.circuit_beaker.mark_timeout(self.group_key, self.command_key)
             logger.error('type: execution_timeout')
 
         except Exception as exception:
             future = self.fallback()
-            component.circuit_beaker.report_failure(self.group_key, self.command_key)
+            component.circuit_beaker.mark_failure(self.group_key, self.command_key)
             logger.error('type: execution_fail, reason: %s', exception.message)
 
         raise gen.Return(future)

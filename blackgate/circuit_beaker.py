@@ -2,16 +2,16 @@
 
 class CircuitBeaker(object):
 
-    def report_success(self, group_key, command_key):
+    def mark_success(self, group_key, command_key):
         pass
 
-    def report_reject(self, group_key, command_key):
+    def mark_reject(self, group_key, command_key):
         pass
 
-    def report_timeout(self, group_key, command_key):
+    def mark_timeout(self, group_key, command_key):
         pass
 
-    def report_failure(self, group_key, command_key):
+    def mark_failure(self, group_key, command_key):
         pass
 
     def is_allow_request(self, group_key, command_key):
