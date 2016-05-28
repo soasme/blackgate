@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 
 from .executor_pools  import ExecutorPools
-from .circuit_beaker import CircuitBeaker
+from .circuit_beaker import NoCircuitBeaker, InProcessCircuitBeaker
 
 class Component(object):
 
     def __init__(self):
         self.pools = ExecutorPools()
-        self.circuit_beaker = CircuitBeaker()
+        self.circuit_beakers = {}
+        self.circuit_beaker_impl = NoCircuitBeaker
+        self.circuit_beaker_options = {}
         self.configurations = {}
 
     def set(self, key, value):
@@ -23,6 +25,22 @@ class Component(object):
         del self.configurations[key]
 
     def install(self):
+        self.install_executor_pool()
+        self.install_circuit_beaker()
+
+    def install_executor_pool(self):
         if 'executor_pool' in self.configurations:
             for executor_pool in self.configurations['executor_pool']:
                 self.pools.register_pool(executor_pool['group_key'], executor_pool['max_workers'])
+
+    def install_circuit_beaker(self):
+        if 'circuit_beaker_enabled' in self.configurations:
+            self.circuit_beaker_impl = NoCircuitBeaker
+            self.circuit_beaker_options = {}
+        elif 'circuit_beaker_impl' not in self.configurations:
+            self.circuit_beaker_impl = InProcessCircuitBeaker
+            self.circuit_beaker_options = {'metrics': None} # FIXME
+        else:
+            # FIXME: add definition of import_string
+            self.circuit_beaker_impl = import_string(self.configurations['circuit_beaker_impl'])
+            self.circuit_beaker_options = self.configurations.get('circuit_beaker_options') or {}
