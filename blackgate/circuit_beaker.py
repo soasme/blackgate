@@ -2,29 +2,91 @@
 
 class CircuitBeaker(object):
 
-    def mark_success(self, group_key, command_key):
+    def __init__(self, command_key, group_key, **kwargs):
+        self.command_key = command_key
+        self.group_key = group_key
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+
+    def mark_success(self):
+        raise NotImplementedError
+
+    def mark_reject(self):
+        raise NotImplementedError
+
+    def mark_timeout(self):
+        raise NotImplementedError
+
+    def mark_failure(self):
+        raise NotImplementedError
+
+    def allow_request(self):
+        raise NotImplementedError
+
+    def is_open(self):
+        raise NotImplementedError
+
+
+class NoCircuitBeaker(CircuitBeaker):
+
+    def mark_success(self):
         pass
 
-    def mark_reject(self, group_key, command_key):
+    def mark_reject(self):
         pass
 
-    def mark_timeout(self, group_key, command_key):
+    def mark_timeout(self):
         pass
 
-    def mark_failure(self, group_key, command_key):
+    def mark_failure(self):
         pass
 
-    def is_allow_request(self, group_key, command_key):
+    def allow_request(self):
         return True
 
     def is_open(self):
         return False
 
-    def is_closed(self):
+
+class InProcessCircuitBeaker(CircuitBeaker):
+
+    def __init__(self, command_key, group_key, metrics):
+        super(InProcessCircuitBeaker, self).__init__(
+            command_key,
+            group_key,
+            metrics=metrics,
+        )
+
+    def mark_success(self):
+        pass
+
+    def mark_reject(self):
+        pass
+
+    def mark_timeout(self):
+        pass
+
+    def mark_failure(self):
+        pass
+
+    def allow_request(self):
         return True
 
-    def is_half_closed(self):
-        return True
+    def is_open(self):
+        return False
 
-    def is_half_open(self):
-        return self.is_half_closed()
+
+
+def get_circuit_beaker(table, command_key, group_key, impl=InProcessCircuitBeaker, **kwargs):
+    """
+    :param table: dict.
+    :param command_key: string, Command Key.
+    :param group_key: string, Command Group Key.
+    :param impl: class inherited from CircuitBeaker. default: InProcessCircuitBeaker
+    """
+    if command_key in table:
+        return table[command_key]
+
+    table[command_key] = impl(command_key, group_key, **kwargs)
+
+    return table[command_key]
