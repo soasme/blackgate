@@ -69,7 +69,7 @@ class TestCommand(AsyncTestCase):
 
         class TimeoutCommand(Command):
             group_key = 'test_command'
-            timeout = 0.1
+            timeout_seconds = 0.1
 
             def run(self):
                 sleep(0.2)
@@ -82,3 +82,21 @@ class TestCommand(AsyncTestCase):
 
         result = yield command.queue()
         assert result == 'fallback'
+
+
+    @gen_test
+    def test_disable_timeout(self):
+        from time import sleep
+
+        class NoTimeoutCommand(Command):
+            group_key = 'test_command'
+            timeout_seconds = 0.1
+            timeout_enabled = False
+
+            def run(self):
+                sleep(0.2)
+                return 'run'
+
+        command = NoTimeoutCommand()
+        result = yield command.queue()
+        assert result == 'run'
