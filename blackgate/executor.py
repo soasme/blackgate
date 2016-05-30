@@ -20,8 +20,7 @@ class WorkItem(object):
         try:
             result = self.fn(*self.args, **self.kwargs)
         except BaseException:
-            e, tb = sys.exc_info()[1:]
-            self.future.set_exc_info(e)
+            self.future.set_exc_info(sys.exc_info())
         else:
             self.future.set_result(result)
 
