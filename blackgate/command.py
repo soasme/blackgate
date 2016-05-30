@@ -26,15 +26,19 @@ class Command(object):
     def fallback(self):
         raise NotImplementedError
 
-    @gen.coroutine
-    def queue(self):
-        # TODO: implement cache machenism.
-        circuit_beaker = component.get_circuit_beaker(
+    @property
+    def circuit_beaker(self):
+        return component.get_circuit_beaker(
             self.command_key,
             self.group_key,
             component.circuit_beaker_impl,
             **component.circuit_beaker_options
         )
+
+    @gen.coroutine
+    def queue(self):
+        # TODO: implement cache machenism.
+        circuit_beaker = self.circuit_beaker
 
         if not circuit_beaker.allow_request():
             future = self.fallback()
