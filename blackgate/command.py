@@ -3,6 +3,7 @@
 from __future__ import absolute_import
 
 import logging
+from copy import deepcopy
 from datetime import timedelta
 
 import requests
@@ -16,14 +17,12 @@ logger = logging.getLogger(__name__)
 
 class Command(object):
 
-    # FIXME: find a better way to declare group_key
-    group_key = 'default'
-
-    command_key = None
-
-    timeout_seconds = 1
-
-    timeout_enabled = True
+    __command_args__ = {
+        'group_key': 'default',
+        'command_key': None,
+        'timeout_seconds': 1,
+        'timeout_enabled': True,
+    }
 
     def run(self):
         raise NotImplementedError
@@ -34,27 +33,41 @@ class Command(object):
     @property
     def circuit_beaker(self):
         return component.get_circuit_beaker(
-            self.command_key,
-            self.group_key,
+            self.options.get('command_key'),
+            self.options.get('group_key'),
             component.circuit_beaker_impl,
             **component.circuit_beaker_options
         )
+
+    @property
+    def options(self):
+        if hasattr(self, '_options'):
+            return self._options
+
+        args = deepcopy(Command.__command_args__)
+        args.update(self.__command_args__)
+        setattr(self, '_options', args)
+
+        return args
 
     @gen.coroutine
     def queue(self):
         # TODO: implement cache machenism.
         circuit_beaker = self.circuit_beaker
+        timeout_enabled = self.options.get('timeout_enabled')
+        timeout_seconds = self.options.get('timeout_seconds')
+        group_key = self.options.get('group_key')
 
         if not circuit_beaker.allow_request():
             result = self.fallback()
             logger.error('type: circuit_beaker_reject')
             raise gen.Return(result)
 
-        executor = component.pools.get_executor(self.group_key)
+        executor = component.pools.get_executor(group_key)
 
         try:
-            if self.timeout_enabled:
-                timeout = timedelta(seconds=self.timeout_seconds)
+            if timeout_enabled:
+                timeout = timedelta(seconds=timeout_seconds)
                 result = yield gen.with_timeout(timeout, executor.submit(self.run))
             else:
                 result = yield executor.submit(self.run)
