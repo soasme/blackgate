@@ -6,15 +6,6 @@ from tornado.ioloop import IOLoop
 
 class ExecutorPools(object):
 
-    class PoolFull(Exception):
-        pass
-
-    class ExecutionTimeout(Exception):
-        pass
-
-    class ExecutionFailure(Exception):
-        pass
-
     def __init__(self):
         self.pools = {}
 
