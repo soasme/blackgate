@@ -7,6 +7,7 @@ import logging
 import requests
 from tornado import gen
 from tornado.ioloop import IOLoop
+from concurrent.futures import TimeoutError
 
 from blackgate.core import component
 
@@ -28,15 +29,14 @@ class Command(object):
     @gen.coroutine
     def queue(self):
         # TODO: implement cache machenism.
-
         circuit_beaker = component.get_circuit_beaker(
             self.command_key,
             self.group_key,
             component.circuit_beaker_impl,
-            **component.circuit_beaker_options,
+            **component.circuit_beaker_options
         )
 
-        if not circuit_beaker.allow_request(self.group_key, self.command_key):
+        if not circuit_beaker.allow_request():
             future = self.fallback()
             raise gen.Return(future)
 
@@ -44,21 +44,21 @@ class Command(object):
 
         try:
             future = yield executor.submit(self.run)
-            circuit_beaker.mark_success(self.group_key, self.command_key)
+            circuit_beaker.mark_success()
 
         except component.pools.PoolFull:
             future = self.fallback()
-            circuit_beaker.mark_reject(self.group_key, self.command_key)
+            circuit_beaker.mark_reject()
             logger.error('type: pool_full')
 
-        except component.pools.ExecutionTimeout:
+        except TimeoutError:
             future = self.fallback()
-            circuit_beaker.mark_timeout(self.group_key, self.command_key)
+            circuit_beaker.mark_timeout()
             logger.error('type: execution_timeout')
 
         except Exception as exception:
             future = self.fallback()
-            circuit_beaker.mark_failure(self.group_key, self.command_key)
+            circuit_beaker.mark_failure()
             logger.error('type: execution_fail, reason: %s', exception.message)
 
         raise gen.Return(future)
