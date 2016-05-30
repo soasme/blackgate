@@ -21,6 +21,8 @@ class Command(object):
 
     command_key = None
 
+    timeout = 1
+
     def run(self):
         raise NotImplementedError
 
@@ -49,7 +51,7 @@ class Command(object):
         executor = component.pools.get_executor(self.group_key)
 
         try:
-            timeout = timedelta(seconds=1)
+            timeout = timedelta(seconds=self.timeout)
             result = yield gen.with_timeout(timeout, executor.submit(self.run))
             circuit_beaker.mark_success()
 
