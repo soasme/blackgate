@@ -68,8 +68,7 @@ class Command(object):
         try:
             timeout_seconds = timeout_seconds if timeout_enabled else 30 # FIXME
             timeout = timedelta(seconds=timeout_seconds)
-            future = executor.submit(self.run)
-            result = yield gen.with_timeout(timeout, future)
+            result = yield gen.with_timeout(timeout, executor.submit(self.run))
             circuit_beaker.mark_success()
 
         except component.pools.PoolFull:
