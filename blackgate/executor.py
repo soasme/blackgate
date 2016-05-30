@@ -15,7 +15,6 @@ class WorkItem(object):
         self.args = args
         self.kwargs = kwargs
 
-    @run_on_executor
     def run(self):
         try:
             result = self.fn(*self.args, **self.kwargs)
@@ -26,10 +25,12 @@ class WorkItem(object):
 
 class QueueExecutor(object):
 
-    def __init__(self, pool_key, max_size):
+    def __init__(self, pool_key, max_size, max_workers):
         self._pool_key = pool_key
         self._max_size = max_size
+        self._max_workers = max_workers
         self._work_queue = queues.Queue(max_size)
+        self._work_executor = ThreadPoolExecutor(max_workers)
 
     def submit(self, fn, *args, **kwargs):
         future = Future()
@@ -42,6 +43,6 @@ class QueueExecutor(object):
         while True:
             try:
                 item = yield self._work_queue.get()
-                yield item.run()
+                yield self._work_executor.submit(item.run)
             finally:
                 self._work_queue.task_done()
