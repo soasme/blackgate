@@ -66,11 +66,10 @@ class Command(object):
         executor = component.pools.get_executor(group_key)
 
         try:
-            if timeout_enabled:
-                timeout = timedelta(seconds=timeout_seconds)
-                result = yield gen.with_timeout(timeout, executor.submit(self.run))
-            else:
-                result = yield executor.submit(self.run)
+            timeout_seconds = timeout_seconds if timeout_enabled else 30 # FIXME
+            timeout = timedelta(seconds=timeout_seconds)
+            future = executor.submit(self.run)
+            result = yield gen.with_timeout(timeout, future)
             circuit_beaker.mark_success()
 
         except component.pools.PoolFull:
