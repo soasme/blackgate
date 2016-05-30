@@ -3,6 +3,7 @@
 from __future__ import absolute_import
 
 import logging
+from datetime import timedelta
 
 import requests
 from tornado import gen
@@ -41,31 +42,33 @@ class Command(object):
         circuit_beaker = self.circuit_beaker
 
         if not circuit_beaker.allow_request():
-            future = self.fallback()
-            raise gen.Return(future)
+            result = self.fallback()
+            logger.error('type: circuit_beaker_reject')
+            raise gen.Return(result)
 
         executor = component.pools.get_executor(self.group_key)
 
         try:
-            future = yield executor.submit(self.run)
+            timeout = timedelta(seconds=1)
+            result = yield gen.with_timeout(timeout, executor.submit(self.run))
             circuit_beaker.mark_success()
 
         except component.pools.PoolFull:
-            future = self.fallback()
+            result = self.fallback()
             circuit_beaker.mark_reject()
             logger.error('type: pool_full')
 
-        except TimeoutError:
-            future = self.fallback()
+        except gen.TimeoutError:
+            result = self.fallback()
             circuit_beaker.mark_timeout()
             logger.error('type: execution_timeout')
 
         except Exception as exception:
-            future = self.fallback()
+            result = self.fallback()
             circuit_beaker.mark_failure()
             logger.error('type: execution_fail, reason: %s', exception.message)
 
-        raise gen.Return(future)
+        raise gen.Return(result)
 
     def execute(self):
         try:
