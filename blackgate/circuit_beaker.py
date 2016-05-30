@@ -49,6 +49,7 @@ class NoCircuitBeaker(CircuitBeaker):
 
 
 class InProcessCircuitBeaker(CircuitBeaker):
+    # TODO:
 
     def __init__(self, command_key, group_key, metrics):
         super(InProcessCircuitBeaker, self).__init__(
