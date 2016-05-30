@@ -21,7 +21,9 @@ class Command(object):
 
     command_key = None
 
-    timeout = 1
+    timeout_seconds = 1
+
+    timeout_enabled = True
 
     def run(self):
         raise NotImplementedError
@@ -51,8 +53,11 @@ class Command(object):
         executor = component.pools.get_executor(self.group_key)
 
         try:
-            timeout = timedelta(seconds=self.timeout)
-            result = yield gen.with_timeout(timeout, executor.submit(self.run))
+            if self.timeout_enabled:
+                timeout = timedelta(seconds=self.timeout_seconds)
+                result = yield gen.with_timeout(timeout, executor.submit(self.run))
+            else:
+                result = yield executor.submit(self.run)
             circuit_beaker.mark_success()
 
         except component.pools.PoolFull:
