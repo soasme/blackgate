@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from tornado.httpclient import AsyncHTTPClient
-from tornado.testing import gen_test, AsyncTestCase
+from mock import patch
+from pytest import raises
+from concurrent.futures import TimeoutError
 from blackgate import Command, component
+from tornado.testing import gen_test, AsyncTestCase
+
 
 class TestCommand(AsyncTestCase):
 
@@ -38,9 +41,43 @@ class TestCommand(AsyncTestCase):
 
 
     def test_default_no_circuit_beaker(self):
-        class AssertNoCircuitBeakerCommand(Command):
-            pass
+        class AssertNoCircuitBeakerCommand(Command): pass
 
         command = AssertNoCircuitBeakerCommand()
         from blackgate.circuit_beaker import NoCircuitBeaker
         assert isinstance(command.circuit_beaker, NoCircuitBeaker)
+
+
+    @gen_test
+    def test_open_circuit_beaker_will_cause_queue_reject(self):
+        class OpenCircuitBeakerCommand(Command):
+            group_key = 'test_command'
+            def run(self): return 'run'
+            def fallback(self): return 'fallback'
+
+        command = OpenCircuitBeakerCommand()
+        with patch.object(command.circuit_beaker, 'allow_request') as allow_request:
+            allow_request.return_value = False
+
+            result = yield command.queue()
+            assert result == 'fallback'
+
+
+    @gen_test
+    def test_timeout(self):
+        from time import sleep
+
+        class TimeoutCommand(Command):
+            group_key = 'test_command'
+
+            def run(self):
+                sleep(2)
+                return 'run'
+
+            def fallback(self):
+                return 'fallback'
+
+        command = TimeoutCommand()
+
+        result = yield command.queue()
+        assert result == 'fallback'
