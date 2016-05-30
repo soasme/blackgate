@@ -11,13 +11,12 @@ class TestCommand(AsyncTestCase):
 
     def setUp(self):
         super(TestCommand, self).setUp()
-        component.pools.register_pool('test_command', max_workers=1)
+        component.pools.register_pool('default', max_workers=1)
 
 
     @gen_test
     def test_queue(self):
         class SimpleCommand(Command):
-            group_key = 'test_command'
             def run(self):
                 return 'run'
 
@@ -29,7 +28,6 @@ class TestCommand(AsyncTestCase):
     @gen_test
     def test_fallback(self):
         class FallbackCommand(Command):
-            group_key = 'test_command'
             def run(self):
                 raise Exception
             def fallback(self):
@@ -41,7 +39,8 @@ class TestCommand(AsyncTestCase):
 
 
     def test_default_no_circuit_beaker(self):
-        class AssertNoCircuitBeakerCommand(Command): pass
+        class AssertNoCircuitBeakerCommand(Command):
+            pass
 
         command = AssertNoCircuitBeakerCommand()
         from blackgate.circuit_beaker import NoCircuitBeaker
@@ -51,7 +50,6 @@ class TestCommand(AsyncTestCase):
     @gen_test
     def test_open_circuit_beaker_will_cause_queue_reject(self):
         class OpenCircuitBeakerCommand(Command):
-            group_key = 'test_command'
             def run(self): return 'run'
             def fallback(self): return 'fallback'
 
@@ -68,8 +66,9 @@ class TestCommand(AsyncTestCase):
         from time import sleep
 
         class TimeoutCommand(Command):
-            group_key = 'test_command'
-            timeout_seconds = 0.1
+            __command_args__ = dict(
+                timeout_seconds=0.1,
+            )
 
             def run(self):
                 sleep(0.2)
@@ -89,9 +88,10 @@ class TestCommand(AsyncTestCase):
         from time import sleep
 
         class NoTimeoutCommand(Command):
-            group_key = 'test_command'
-            timeout_seconds = 0.1
-            timeout_enabled = False
+            __command_args__ = dict(
+                timeout_seconds=0.1,
+                timeout_enabled=False,
+            )
 
             def run(self):
                 sleep(0.2)
