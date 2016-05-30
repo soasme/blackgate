@@ -11,7 +11,7 @@ class TestCommand(AsyncTestCase):
 
     def setUp(self):
         super(TestCommand, self).setUp()
-        component.pools.register_pool('default', max_workers=1)
+        component.pools.register_pool('default', max_size=1)
 
 
     @gen_test
