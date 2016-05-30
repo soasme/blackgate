@@ -18,8 +18,8 @@ class ExecutorPools(object):
     def __init__(self):
         self.pools = {}
 
-    def register_pool(self, group_key, max_size=1):
-        executor = QueueExecutor(pool_key=group_key, max_size=max_size)
+    def register_pool(self, group_key, max_size=10, max_workers=10):
+        executor = QueueExecutor(pool_key=group_key, max_size=max_size, max_workers=max_workers)
         IOLoop.current().spawn_callback(executor.consume)
         self.pools[group_key] = executor
 
