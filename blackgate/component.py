@@ -14,7 +14,7 @@ class Component(object):
         self.circuit_beaker_options = {}
         self.get_circuit_beaker = partial(
             get_circuit_beaker,
-            table=self.circuit_beakers,
+            self.circuit_beakers,
         )
         self.configurations = {}
 
@@ -35,6 +35,8 @@ class Component(object):
         self.install_circuit_beaker()
 
     def install_executor_pool(self):
+        self.pools.register_pool('default', 1)
+
         if 'executor_pool' in self.configurations:
             for executor_pool in self.configurations['executor_pool']:
                 self.pools.register_pool(executor_pool['group_key'], executor_pool['max_workers'])
