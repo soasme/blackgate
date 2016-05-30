@@ -29,7 +29,7 @@ class TestCommand(AsyncTestCase):
     def test_fallback(self):
         class FallbackCommand(Command):
             def run(self):
-                raise Exception
+                raise Exception("Let's fallback!")
             def fallback(self):
                 return 'fallback'
 
@@ -100,3 +100,22 @@ class TestCommand(AsyncTestCase):
         command = NoTimeoutCommand()
         result = yield command.queue()
         assert result == 'run'
+
+
+    @gen_test
+    def test_full_pool(self):
+        class FullPoolCommand(Command):
+            def run(self):
+                return 'run'
+            def fallback(self):
+                return 'fallback'
+
+        future1 = FullPoolCommand().queue()
+        future2 = FullPoolCommand().queue()
+        future3 = FullPoolCommand().queue()
+
+        result1 = yield future1
+        result2 = yield future2
+        result3 = yield future3
+
+        assert result3 == 'fallback'
