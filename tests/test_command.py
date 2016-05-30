@@ -10,6 +10,7 @@ class TestCommand(AsyncTestCase):
         super(TestCommand, self).setUp()
         component.pools.register_pool('test_command', max_workers=1)
 
+
     @gen_test
     def test_queue(self):
         class SimpleCommand(Command):
@@ -34,3 +35,12 @@ class TestCommand(AsyncTestCase):
         command = FallbackCommand()
         result = yield command.queue()
         assert result == 'fallback'
+
+
+    def test_default_no_circuit_beaker(self):
+        class AssertNoCircuitBeakerCommand(Command):
+            pass
+
+        command = AssertNoCircuitBeakerCommand()
+        from blackgate.circuit_beaker import NoCircuitBeaker
+        assert isinstance(command.circuit_beaker, NoCircuitBeaker)
