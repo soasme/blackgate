@@ -7,7 +7,7 @@ from copy import deepcopy
 from datetime import timedelta
 
 import requests
-from tornado import gen
+from tornado import gen, queues
 from tornado.ioloop import IOLoop
 from concurrent.futures import TimeoutError
 
@@ -71,7 +71,7 @@ class Command(object):
             result = yield gen.with_timeout(timeout, executor.submit(self.run))
             circuit_beaker.mark_success()
 
-        except component.pools.PoolFull:
+        except queues.QueueFull:
             result = self.fallback()
             circuit_beaker.mark_reject()
             logger.error('type: pool_full')
