@@ -63,7 +63,7 @@ class HTTPProxy(web.RequestHandler):
             }:
                 continue
 
-            if k == 'Set-Cookie':
+            if k == 'Set-Cookie': # FIXME: support multiple set-cookie in headers.
                 self.add_header(k, v)
                 continue
 
