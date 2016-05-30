@@ -69,9 +69,10 @@ class TestCommand(AsyncTestCase):
 
         class TimeoutCommand(Command):
             group_key = 'test_command'
+            timeout = 0.1
 
             def run(self):
-                sleep(2)
+                sleep(0.2)
                 return 'run'
 
             def fallback(self):
