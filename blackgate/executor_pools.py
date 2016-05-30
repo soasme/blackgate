@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from concurrent.futures import ThreadPoolExecutor
+from blackgate.executor import QueueExecutor
+from tornado.ioloop import IOLoop
+
 
 class ExecutorPools(object):
 
@@ -16,8 +18,10 @@ class ExecutorPools(object):
     def __init__(self):
         self.pools = {}
 
-    def register_pool(self, group_key, max_workers=1):
-        self.pools[group_key] = ThreadPoolExecutor(max_workers=max_workers)
+    def register_pool(self, group_key, max_size=1):
+        executor = QueueExecutor(pool_key=group_key, max_size=max_size)
+        IOLoop.current().spawn_callback(executor.consume)
+        self.pools[group_key] = executor
 
     def get_executor(self, group_key):
         if group_key not in self.pools:
