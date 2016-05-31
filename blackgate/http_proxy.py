@@ -2,6 +2,10 @@
 
 from tornado import gen, web
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 class HTTPProxy(web.RequestHandler):
 
     def initialize(self, command):
@@ -47,8 +51,12 @@ class HTTPProxy(web.RequestHandler):
             data=self.request.body,
             headers=headers,
         )
+        logger.debug('request: %s' % request_data)
+
         command = self.command(request_data)
         resp = yield command.queue()
+
+        logger.debug('response: %s' % resp)
         self.write_resp(resp)
 
     def write_resp(self, resp):
@@ -69,4 +77,5 @@ class HTTPProxy(web.RequestHandler):
 
             self.set_header(k, v)
 
-        self.write(resp['content'])
+        if resp['content']:
+            self.write(resp['content'])
