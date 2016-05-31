@@ -18,7 +18,7 @@ class WorkItem(object):
     def run(self):
         try:
             result = self.fn(*self.args, **self.kwargs)
-        except BaseException:
+        except Exception:
             self.future.set_exc_info(sys.exc_info())
         else:
             self.future.set_result(result)
