@@ -109,7 +109,7 @@ class HTTPProxyCommand(Command):
         return
 
     def run(self):
-        session = requests.Session()
+        session = component.session
         self.before_request()
         resp = session.request(
             method=self.request['method'].upper(),

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from requests import Session
 from functools import partial
 
 from blackgate.executor_pools  import ExecutorPools
@@ -8,6 +9,7 @@ from blackgate.circuit_beaker import NoCircuitBeaker, InProcessCircuitBeaker, ge
 class Component(object):
 
     def __init__(self):
+        self.session = Session()
         self.pools = ExecutorPools()
         self.circuit_beakers = {}
         self.circuit_beaker_impl = NoCircuitBeaker
