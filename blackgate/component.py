@@ -58,16 +58,18 @@ class Component(object):
             self.circuit_beaker_options = self.configurations.get('circuit_beaker_options') or {}
 
     def install_session(self):
-        if 'requests_session_mounts' in self.configurations:
-            for mount in self.configurations['requests_session_mounts']:
-                pool_connections = mount.get('pool_connections') or 10
-                pool_maxsize = mount.get('pool_maxsize') or 10
-                max_retries = mount.get('max_retries') or 0
-                pool_block = mount.get('pool_block') or False
-                prefix = mount['prefix']
-                self.session.mount(prefix, HTTPAdapter(
-                    pool_connections=pool_connections,
-                    pool_maxsize=pool_maxsize,
-                    max_retries=max_retries,
-                    pool_block=pool_block,
-                ))
+        if 'requests_session_mounts' not in self.configurations:
+            return
+
+        for mount in self.configurations['requests_session_mounts']:
+            pool_connections = mount.get('pool_connections') or 10
+            pool_maxsize = mount.get('pool_maxsize') or 10
+            max_retries = mount.get('max_retries') or 0
+            pool_block = mount.get('pool_block') or False
+            prefix = mount['prefix']
+            self.session.mount(prefix, HTTPAdapter(
+                pool_connections=pool_connections,
+                pool_maxsize=pool_maxsize,
+                max_retries=max_retries,
+                pool_block=pool_block,
+            ))
