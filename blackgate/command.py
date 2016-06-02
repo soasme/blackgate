@@ -69,7 +69,7 @@ class Command(object):
             timeout_seconds = timeout_seconds if timeout_enabled else 30 # FIXME
             timeout = timedelta(seconds=timeout_seconds)
             result = yield gen.with_timeout(timeout, executor.submit(self.run))
-            circuit_beaker.mark_success()
+            circuit_beaker.mark_success() # FIXME: this should be async, possibly network error
 
         except queues.QueueFull:
             result = self.fallback()
@@ -81,7 +81,10 @@ class Command(object):
             circuit_beaker.mark_timeout()
             logger.error('type: execution_timeout')
 
-        except Exception as exception:
+        # FIXME: catch more exceptions: submit failure, wrong timeout type, mark_success run failed.
+
+        except Exception as exception: # FIXME: only network error should fallback, others crash it??
+            # XXX: use some error aggreation system like sentry to report errors???
             result = self.fallback()
             circuit_beaker.mark_failure()
             logger.error('type: execution_fail, reason: %s', exception.message)
