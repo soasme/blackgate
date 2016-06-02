@@ -21,6 +21,10 @@ class Component(object):
         )
         self.configurations = {}
 
+    @property
+    def config(self):
+        return self.configurations
+
     def set(self, key, value):
         self.configurations[key] = value
 
