@@ -6,8 +6,8 @@ Command: blackgate
 
     $ blackgate [blackgate_options] <command> [command_options]
 
-blackgate_options:
-``````````````````
+blackgate_options
+-------------------
 
 1. `-c /path/to/blackgate.yml`
 
@@ -25,7 +25,7 @@ Blackgate will fail to start without loading a yaml config file.
 This file contains configuration for upstream services, plugins, etc.
 
 command: start
-````````````````
+---------------
 
 Starts a Blackgate instance::
 
@@ -33,7 +33,7 @@ Starts a Blackgate instance::
 
 
 command: stop
-``````````````
+--------------
 
 Terminates a Blackgate instance::
 
@@ -43,7 +43,7 @@ Note: Blackgate will shutdown instance gracefully.
 
 
 command: restart
-`````````````````
+----------------
 
 Restart a Blackgate instance::
 
@@ -54,7 +54,7 @@ a Blackgate instance directly.
 
 
 command: reload
-````````````````
+----------------
 
 Reload Blackgate configuration::
 
@@ -62,7 +62,7 @@ Reload Blackgate configuration::
 
 
 command: status
-```````````````
+---------------
 
 Output the status of Blackgate::
 
