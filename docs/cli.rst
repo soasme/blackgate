@@ -20,9 +20,20 @@ Blackgate by default search configuration file from files listed below by order.
 * `/usr/local/etc/blackgate/blackgate.yml`
 * `/etc/blackgate/blackgate.yml`
 
-Blackgate will fail to start without loading a yaml config file.
+Blackgate will fail to run without loading a yaml config file, except command `init`.
 
 This file contains configuration for upstream services, plugins, etc.
+
+command: init
+--------------
+
+Create a configuration file at current directory::
+
+    $ blackgate init
+
+Create a configuration file at specific directory::
+
+    $ blackgate init -c /path/to/blackgate.yml
 
 command: start
 ---------------
