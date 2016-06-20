@@ -13,9 +13,9 @@ Contents:
 
    introduction
    quick_start
-   proxy
-   configuration
    cli
+   configuration
+   proxy
    plugins
 
 
