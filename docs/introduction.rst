@@ -32,4 +32,4 @@ probably a better choice.
 
 You might also want to monitor and register services to
 your service discovery service. Although it's a complicated
-solution, it still turns out to be a mature solution.
+solution, it still turns out to be a mature one.
