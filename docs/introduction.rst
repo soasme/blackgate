@@ -21,7 +21,7 @@ consul, etcd, zookeeper, etc.
 
 Blackgate is not a load balancer, which means that you have
 to choose your load balancer for your upstream services. Nginx
-and HAProxy are two excellent server-side load blancing solution.
+and HAProxy are two excellent server-side load blancing solutions.
 
 Alternative Solution
 ---------------------
