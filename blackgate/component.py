@@ -20,10 +20,15 @@ class Component(object):
             self.circuit_beakers,
         )
         self.configurations = {}
+        self.configurations.setdefault('urls', [])
 
     @property
     def config(self):
         return self.configurations
+
+    @property
+    def urls(self):
+        return self.configurations['urls']
 
     def set(self, key, value):
         self.configurations[key] = value
