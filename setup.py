@@ -11,9 +11,9 @@ with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
 requirements = [
-    'futures==3.0.5',
-    'requests==2.10.0',
-    'tornado==4.3',
+    'futures>=3.0.5',
+    'requests>=2.10.0',
+    'tornado>=4.3',
 ]
 
 test_requirements = [
