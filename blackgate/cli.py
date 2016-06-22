@@ -3,7 +3,7 @@
 import click
 
 from blackgate.core import component
-from blackgate.server importrun
+from blackgate.server import run
 
 @click.group()
 def main():
