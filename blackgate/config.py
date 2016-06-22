@@ -4,7 +4,8 @@ import os
 import yaml
 from blackgate.errors import InvalidConfig
 
-def verify_proxy(conf):
+def verify_proxies(conf):
+    """Verify whether proxies field is correct."""
     if not conf.get('proxies'):
         return
     for proxy in conf.get('proxies'):
@@ -14,8 +15,8 @@ def verify_proxy(conf):
             raise InvalidConfig('Missing Upstream Name, example: `name: myservice')
 
 
-
 def parse_yaml_config(config):
+    """Parse config from string in YAML format to dict."""
     try:
         return yaml.load(config)
     except ValueError:
@@ -23,6 +24,7 @@ def parse_yaml_config(config):
 
 
 def read_yaml_config(path):
+    """Read file content from path"""
     try:
         with open(path) as f:
             return f.read()
@@ -30,6 +32,7 @@ def read_yaml_config(path):
         pass
 
 def read_default_config():
+    """Read config from several default paths."""
     config = (
         read_yaml_config(os.path.join(os.getcwd(), 'blackgate.yml')) or \
         read_yaml_config(os.path.join(os.getlogin(), '.blackgate.yml')) or \
