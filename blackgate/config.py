@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import os
 import yaml
 from blackgate.errors import InvalidConfig
 
@@ -19,3 +20,20 @@ def parse_yaml_config(config):
         return yaml.load(config)
     except ValueError:
         raise InvalidConfig('Broken YAML config.')
+
+
+def read_yaml_config(path):
+    try:
+        with open(path) as f:
+            return f.read()
+    except IOError:
+        pass
+
+def read_default_config():
+    config = (
+        read_yaml_config(os.path.join(os.getcwd(), 'blackgate.yml')) or \
+        read_yaml_config(os.path.join(os.getlogin(), '.blackgate.yml')) or \
+        read_yaml_config(os.path.join('usr', 'local', 'etc', 'blackgate', 'blackgate.yml')) or \
+        read_yaml_config(os.path.join('etc', 'blackgate', 'blackgate.yml'))
+    )
+    return config
