@@ -82,3 +82,17 @@ class Component(object):
                 max_retries=max_retries,
                 pool_block=pool_block,
             ))
+
+    def install_tornado_urls(self):
+        self.configurations['urls'] = []
+
+        from blackgate.http_proxy import HTTPProxy
+        from blackgate.command import HTTPProxyCommand
+
+        for proxy in self.configurations.get('proxies', []):
+            route = [
+                r'%s/(.*)' % proxy['request_path'],
+                HTTPProxy(),
+                dict(command=HTTPProxyCommand, proxy=proxy),
+            ]
+            self.configurations['urls'].append(route)
