@@ -8,8 +8,9 @@ logger = logging.getLogger(__name__)
 
 class HTTPProxy(web.RequestHandler):
 
-    def initialize(self, command):
+    def initialize(self, command, proxy):
         self.command= command
+        self.proxy = proxy
 
     @gen.coroutine
     def get(self, *args, **kwargs):
@@ -44,9 +45,15 @@ class HTTPProxy(web.RequestHandler):
         headers = dict(self.request.headers.get_all())
         headers.pop('Host', None)
         headers['User-Agent'] = 'Blackgate/0.1.0'
+        if self.proxy.get('stripe_request_path'):
+            path = self.request.path[len(self.proxy['request_path']):]
+        else:
+            path = self.request.path
+        upstream_url = self.proxy['upstream_url']
+        url = upstream_url + path
         request_data = dict(
             method=self.request.method,
-            path=self.request.path,
+            url=url,
             params=self.request.query_arguments,
             data=self.request.body,
             headers=headers,
