@@ -2,6 +2,7 @@
 
 from __future__ import absolute_import
 
+import json
 import logging
 from copy import deepcopy
 from datetime import timedelta
@@ -129,3 +130,17 @@ class HTTPProxyCommand(Command):
         )
         self.after_response()
         return self.response
+
+    def fallback(self):
+        return dict(
+            status_code=502,
+            reason='Bad Gateway',
+            headers={
+                'Content-Type': 'application/json',
+            },
+            content=json.dumps({
+                'code': 500,
+                'message': 'using fallback mechanism',
+                'errors': []
+            })
+        )
