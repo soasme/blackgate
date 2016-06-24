@@ -17,5 +17,5 @@ class ExecutorPools(object):
 
     def get_executor(self, group_key):
         if group_key not in self.pools:
-            raise Exception("Pool not registerd")
+            raise Exception("Pool not registerd: %s" % group_key)
         return self.pools[group_key]
