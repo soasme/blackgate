@@ -11,8 +11,10 @@ from blackgate.server import Server
 
 @click.group()
 @click.option('-c', '--config', default='')
+@click.option('--daemon/--no-daemon', default=True)
+@click.option('--pidfile')
 @click.pass_context
-def main(ctx, config):
+def main(ctx, config, daemon, pidfile):
     if not config:
         config = read_default_config()
     else:
@@ -29,61 +31,43 @@ def main(ctx, config):
     component.configurations = config
     component.install()
 
+    if not pidfile:
+        pidfile = config['pidfile']
+    if not pidfile:
+        pidfile = '/var/run/blackgate.pid'
+
+    ctx.obj = {}
+    ctx.obj['server'] = Server(pidfile)
+    ctx.obj['daemon'] = daemon
+
 
 
 @main.command()
-@click.option('--daemon/--no-daemon', default=True)
-@click.option('--pidfile', default='/var/run/blackgate.pid')
 @click.pass_context
-def start(ctx, daemon, pidfile):
-    config = component.configurations
-
-    if pidfile != config['pidfile']:
-        pidfile = config['pidfile']
-
-    daemon = Server(pidfile)
-
-    if daemon:
-        daemon.start()
+def start(ctx):
+    if ctx.obj['daemon']:
+        ctx.obj['server'].start()
     else:
-        daemon.run()
+        ctx.obj['server'].run()
 
 @main.command()
-@click.option('--pidfile', default='/var/run/blackgate.pid')
 @click.pass_context
-def stop(ctx, pidfile):
-    config = component.configurations
-
-    if pidfile != config['pidfile']:
-        pidfile = config['pidfile']
-
-    daemon = Server(pidfile)
-    daemon.stop()
+def stop(ctx):
+    server = ctx.obj['server']
+    server.stop()
 
 
 @main.command()
-@click.option('--pidfile', default='/var/run/blackgate.pid')
 @click.pass_context
-def restart(ctx, pidfile):
-    config = component.configurations
-
-    if pidfile != config['pidfile']:
-        pidfile = config['pidfile']
-
-    daemon = Server(pidfile)
-    daemon.restart()
+def restart(ctx):
+    server = ctx.obj['server']
+    server.restart()
 
 @main.command()
-@click.option('--pidfile', default='/var/run/blackgate.pid')
 @click.pass_context
-def status(ctx, pidfile):
-    config = component.configurations
-
-    if pidfile != config['pidfile']:
-        pidfile = config['pidfile']
-
-    daemon = Server(pidfile)
-    daemon.is_running()
+def status(ctx):
+    server = ctx.obj['server']
+    server.is_running()
 
 
 
