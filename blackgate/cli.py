@@ -26,6 +26,7 @@ def main(ctx, config):
     except ValueError:
         ctx.fail('config is not valid yaml.')
 
+    ctx.obj = {}
     ctx.obj['config'] = config
 
 
