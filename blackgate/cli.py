@@ -78,6 +78,20 @@ def restart(ctx, pidfile):
     daemon = Server(pidfile)
     daemon.restart()
 
+@main.command()
+@click.option('--pidfile', default='/var/run/blackgate.pid')
+@click.pass_context
+def status(ctx, pidfile):
+    config = ctx.obj['config']
+    component.configurations = config
+    component.install()
+
+    if pidfile != config['pidfile']:
+        pidfile = config['pidfile']
+
+    daemon = Server(pidfile)
+    daemon.is_running()
+
 
 
 if __name__ == '__main__':
