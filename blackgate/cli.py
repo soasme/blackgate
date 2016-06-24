@@ -26,8 +26,9 @@ def main(ctx, config):
     except ValueError:
         ctx.fail('config is not valid yaml.')
 
-    ctx.obj = {}
-    ctx.obj['config'] = config
+    component.configurations = config
+    component.install()
+
 
 
 @main.command()
@@ -35,9 +36,7 @@ def main(ctx, config):
 @click.option('--pidfile', default='/var/run/blackgate.pid')
 @click.pass_context
 def start(ctx, daemon, pidfile):
-    config = ctx.obj['config']
-    component.configurations = config
-    component.install()
+    config = component.configurations
 
     if pidfile != config['pidfile']:
         pidfile = config['pidfile']
@@ -53,9 +52,7 @@ def start(ctx, daemon, pidfile):
 @click.option('--pidfile', default='/var/run/blackgate.pid')
 @click.pass_context
 def stop(ctx, pidfile):
-    config = ctx.obj['config']
-    component.configurations = config
-    component.install()
+    config = component.configurations
 
     if pidfile != config['pidfile']:
         pidfile = config['pidfile']
@@ -68,9 +65,7 @@ def stop(ctx, pidfile):
 @click.option('--pidfile', default='/var/run/blackgate.pid')
 @click.pass_context
 def restart(ctx, pidfile):
-    config = ctx.obj['config']
-    component.configurations = config
-    component.install()
+    config = component.configurations
 
     if pidfile != config['pidfile']:
         pidfile = config['pidfile']
@@ -82,9 +77,7 @@ def restart(ctx, pidfile):
 @click.option('--pidfile', default='/var/run/blackgate.pid')
 @click.pass_context
 def status(ctx, pidfile):
-    config = ctx.obj['config']
-    component.configurations = config
-    component.install()
+    config = component.configurations
 
     if pidfile != config['pidfile']:
         pidfile = config['pidfile']
