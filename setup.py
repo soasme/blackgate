@@ -14,6 +14,7 @@ requirements = [
     'futures>=3.0.5',
     'requests>=2.10.0',
     'tornado>=4.3',
+    'PyYAML>=3.11',
 ]
 
 test_requirements = [
@@ -46,5 +47,10 @@ setup(
         'Programming Language :: Python :: 2.7',
     ],
     test_suite='tests',
-    tests_require=test_requirements
+    tests_require=test_requirements,
+    entry_points={
+        'console_scripts': [
+            'blackgate=blackgate.cli:main'
+        ]
+    },
 )
