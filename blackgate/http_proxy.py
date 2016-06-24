@@ -45,7 +45,7 @@ class HTTPProxy(web.RequestHandler):
         headers = dict(self.request.headers.get_all())
         headers.pop('Host', None)
         headers['User-Agent'] = 'Blackgate/0.1.0'
-        if self.proxy.get('stripe_request_path'):
+        if self.proxy.get('strip_request_path'):
             path = self.request.path[len(self.proxy['request_path']):]
         else:
             path = self.request.path
