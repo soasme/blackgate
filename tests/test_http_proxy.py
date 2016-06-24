@@ -24,7 +24,7 @@ class TestHTTPProxy(AsyncHTTPTestCase):
                     },
                     content='SUCCESS'
                 )
-        return Application([(r'/', HTTPProxy, dict(command=ProxyCommand))])
+        return Application([(r'/', HTTPProxy, dict(command=ProxyCommand, proxy={}))])
 
 
     def test_response(self):
