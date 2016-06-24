@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from tornado import gen, web
-
+import re
 import logging
+
+from tornado import gen, web
 
 logger = logging.getLogger(__name__)
 
@@ -45,10 +46,11 @@ class HTTPProxy(web.RequestHandler):
         headers = dict(self.request.headers.get_all())
         headers.pop('Host', None)
         headers['User-Agent'] = 'Blackgate/0.1.0'
-        if self.proxy.get('strip_request_path'):
-            path = self.request.path[len(self.proxy['request_path']):]
-        else:
-            path = self.request.path
+        path = re.sub(
+            self.proxy['request_path_regex'],
+            self.proxy['request_path_sub'],
+            self.request.path
+        )
         upstream_url = self.proxy['upstream_url']
         url = upstream_url + path
         request_data = dict(
