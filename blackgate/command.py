@@ -102,9 +102,19 @@ class Command(object):
 
 class HTTPProxyCommand(Command):
 
-    def __init__(self, request):
+    def __init__(self, request, proxy):
+        self.proxy = proxy
         self.request = request
         self.response = {}
+
+    @property
+    def options(self):
+        return dict(
+            group_key=self.proxy['name'],
+            command_key='proxy',
+            timeout_seconds=self.proxy.get('timeout_seconds') or 1,
+            timeout_enabled=bool(self.proxy.get('timeout_enabled')),
+        )
 
     def before_request(self):
         return
