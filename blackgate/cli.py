@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import os
 import click
 
 from blackgate.core import component
@@ -12,9 +13,15 @@ from blackgate.server import Server
 @click.group()
 @click.option('-c', '--config', default='')
 @click.option('--daemon/--no-daemon', default=True)
-@click.option('--pidfile')
+@click.option('--pidfile', default='/var/run/blackgate.pid')
+@click.option('--stdin', default=os.devnull)
+@click.option('--stdout', default=os.devnull)
+@click.option('--stderr', default=os.devnull)
+@click.option('--directory', default='.')
+@click.option('--umask', type=int, default=022)
 @click.pass_context
-def main(ctx, config, daemon, pidfile):
+def main(ctx, config, daemon, pidfile,
+         stdin, stdout, stderr, directory, umask):
     if not config:
         config = read_default_config()
     else:
@@ -31,13 +38,8 @@ def main(ctx, config, daemon, pidfile):
     component.configurations = config
     component.install()
 
-    if not pidfile:
-        pidfile = config['pidfile']
-    if not pidfile:
-        pidfile = '/var/run/blackgate.pid'
-
     ctx.obj = {}
-    ctx.obj['server'] = Server(pidfile)
+    ctx.obj['server'] = Server(pidfile, stdin, stdout, stderr, directory, umask)
     ctx.obj['daemon'] = daemon
 
 
