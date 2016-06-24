@@ -16,14 +16,14 @@ MAX_WAIT_SECONDS_BEFORE_SHUTDOWN = 20
 
 def sig_handler(sig, frame):
     logging.warning('Caught signal: %s', sig)
-    tornado.ioloop.IOLoop.instance().add_callback(shutdown)
+    shutdown()
 
 def shutdown():
-    logging.info('Stopping http server')
+    logging.warning('Stopping http server')
     global server
     server.stop()
 
-    logging.info('Will shutdown in %s seconds ...', MAX_WAIT_SECONDS_BEFORE_SHUTDOWN)
+    logging.warning('Will shutdown in %s seconds ...', MAX_WAIT_SECONDS_BEFORE_SHUTDOWN)
     io_loop = tornado.ioloop.IOLoop.instance()
 
     deadline = time.time() + MAX_WAIT_SECONDS_BEFORE_SHUTDOWN
@@ -34,7 +34,7 @@ def shutdown():
             io_loop.add_timeout(now + 1, stop_loop)
         else:
             io_loop.stop()
-            logging.info('Shutdown')
+            logging.warning('Shutdown')
     stop_loop()
 
 def run(port):
@@ -47,5 +47,7 @@ def run(port):
     signal.signal(signal.SIGTERM, sig_handler)
     signal.signal(signal.SIGINT, sig_handler)
 
-    tornado.ioloop.IOLoop.current().start()
-    logging.info("Exit...")
+    try:
+        tornado.ioloop.IOLoop.current().start()
+    except KeyboardInterrupt:
+        shutdown()
