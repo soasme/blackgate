@@ -46,11 +46,9 @@ class Component(object):
         self.install_tornado_urls()
 
     def install_executor_pool(self):
-        self.pools.register_pool('default', 1)
-
-        if 'executor_pool' in self.configurations:
-            for executor_pool in self.configurations['executor_pool']:
-                self.pools.register_pool(executor_pool['group_key'], executor_pool['max_workers'])
+        for proxy in self.configurations.get('proxies', []):
+            max_workers = proxy.get('pool_max_workers') or 10
+            self.pools.register_pool(proxy['name'], max_workers)
 
     def install_circuit_beaker(self):
         if 'circuit_beaker_enabled' in self.configurations:
@@ -65,15 +63,12 @@ class Component(object):
             self.circuit_beaker_options = self.configurations.get('circuit_beaker_options') or {}
 
     def install_session(self):
-        if 'requests_session_mounts' not in self.configurations:
-            return
-
-        for mount in self.configurations['requests_session_mounts']:
-            pool_connections = mount.get('pool_connections') or 10
-            pool_maxsize = mount.get('pool_maxsize') or 10
-            max_retries = mount.get('max_retries') or 0
-            pool_block = mount.get('pool_block') or False
-            prefix = mount['prefix']
+        for proxy in self.configurations.get('proxies', []):
+            pool_connections = proxy.get('pool_connections') or 10
+            pool_maxsize = proxy.get('pool_max_size') or 10
+            max_retries = proxy.get('max_retries') or 0
+            pool_block = proxy.get('pool_block') or False
+            prefix = proxy['upstream_url']
             self.session.mount(prefix, HTTPAdapter(
                 pool_connections=pool_connections,
                 pool_maxsize=pool_maxsize,
