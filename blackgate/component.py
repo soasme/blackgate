@@ -11,6 +11,7 @@ class Component(object):
 
     def __init__(self):
         self.session = Session()
+        self.urls = []
         self.pools = ExecutorPools()
         self.circuit_beakers = {}
         self.circuit_beaker_impl = NoCircuitBeaker
@@ -25,10 +26,6 @@ class Component(object):
     @property
     def config(self):
         return self.configurations
-
-    @property
-    def urls(self):
-        return self.configurations['urls']
 
     def set(self, key, value):
         self.configurations[key] = value
@@ -85,15 +82,13 @@ class Component(object):
             ))
 
     def install_tornado_urls(self):
-        self.configurations['urls'] = []
-
         from blackgate.http_proxy import HTTPProxy
         from blackgate.command import HTTPProxyCommand
 
         for proxy in self.configurations.get('proxies', []):
             route = [
-                r'%s/(.*)' % proxy['request_path'],
+                proxy['request_path_regex'],
                 HTTPProxy,
                 dict(command=HTTPProxyCommand, proxy=proxy),
             ]
-            self.configurations['urls'].append(route)
+            self.urls.append(route)
