@@ -62,7 +62,7 @@ class HTTPProxy(web.RequestHandler):
         )
         logger.debug('request: %s' % request_data)
 
-        command = self.command(request_data)
+        command = self.command(request_data, self.proxy)
         resp = yield command.queue()
 
         logger.debug('response: %s' % resp)
