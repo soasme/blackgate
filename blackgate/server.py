@@ -11,6 +11,7 @@ import tornado.ioloop
 import tornado.httpserver
 from tornado.web import Application
 from blackgate.core import component
+from blackgate.daemon import Daemon
 
 MAX_WAIT_SECONDS_BEFORE_SHUTDOWN = 20
 
@@ -51,3 +52,15 @@ def run(port):
         tornado.ioloop.IOLoop.current().start()
     except KeyboardInterrupt:
         shutdown()
+
+
+class Server(Daemon):
+
+    def run(self):
+        app = Application(component.urls)
+        server = tornado.httpserver.HTTPServer(app)
+        server.listen(component.configurations.get('port', 9654))
+        try:
+            tornado.ioloop.IOLoop.current().start()
+        except KeyboardInterrupt:
+            tornado.ioloop.IOLoop.current().stop()
