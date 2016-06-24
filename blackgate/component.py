@@ -46,6 +46,7 @@ class Component(object):
         self.install_executor_pool()
         self.install_circuit_beaker()
         self.install_session()
+        self.install_tornado_urls()
 
     def install_executor_pool(self):
         self.pools.register_pool('default', 1)
@@ -92,7 +93,7 @@ class Component(object):
         for proxy in self.configurations.get('proxies', []):
             route = [
                 r'%s/(.*)' % proxy['request_path'],
-                HTTPProxy(),
+                HTTPProxy,
                 dict(command=HTTPProxyCommand, proxy=proxy),
             ]
             self.configurations['urls'].append(route)
