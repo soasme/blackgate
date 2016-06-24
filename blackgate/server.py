@@ -44,7 +44,7 @@ def run(port):
     server = tornado.httpserver.HTTPServer(app)
     logging.info('Listening on port %s', port)
     server.listen(port)
-    signal.signal(signal.SIGTERM, sig_handler)
+    signal.signal(signal.SIGTERM, sig_handler) # FIXME
     signal.signal(signal.SIGINT, sig_handler)
 
     try:
