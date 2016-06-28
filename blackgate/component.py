@@ -64,9 +64,9 @@ class Component(object):
 
     def install_session(self):
         for proxy in self.configurations.get('proxies', []):
-            pool_connections = proxy.get('pool_connections') or 10
-            pool_maxsize = proxy.get('pool_max_size') or 10
-            max_retries = proxy.get('max_retries') or 0
+            pool_connections = proxy.get('pool_max_workers') or 10
+            pool_maxsize = proxy.get('pool_max_queue_size') or 10
+            max_retries = proxy.get('pool_max_retries') or 0
             pool_block = proxy.get('pool_block') or False
             prefix = proxy['upstream_url']
             self.session.mount(prefix, HTTPAdapter(
@@ -78,12 +78,12 @@ class Component(object):
 
     def install_tornado_urls(self):
         from blackgate.http_proxy import HTTPProxy
-        from blackgate.command import HTTPProxyCommand
+        from blackgate.command import Command
 
         for proxy in self.configurations.get('proxies', []):
             route = [
                 proxy['request_path_regex'],
                 HTTPProxy,
-                dict(command=HTTPProxyCommand, proxy=proxy),
+                dict(proxy=proxy),
             ]
             self.urls.append(route)
