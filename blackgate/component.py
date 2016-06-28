@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from requests import Session
-from requests.adapters import HTTPAdapter
 from functools import partial
 
 from blackgate.executor_pools  import ExecutorPools
@@ -10,7 +8,6 @@ from blackgate.circuit_beaker import NoCircuitBeaker, InProcessCircuitBeaker, ge
 class Component(object):
 
     def __init__(self):
-        self.session = Session()
         self.urls = []
         self.pools = ExecutorPools()
         self.circuit_beakers = {}
@@ -42,7 +39,6 @@ class Component(object):
     def install(self):
         self.install_executor_pool()
         self.install_circuit_beaker()
-        self.install_session()
         self.install_tornado_urls()
 
     def install_executor_pool(self):
@@ -61,20 +57,6 @@ class Component(object):
             # FIXME: add definition of import_string
             self.circuit_beaker_impl = import_string(self.configurations['circuit_beaker_impl'])
             self.circuit_beaker_options = self.configurations.get('circuit_beaker_options') or {}
-
-    def install_session(self):
-        for proxy in self.configurations.get('proxies', []):
-            pool_connections = proxy.get('pool_max_workers') or 10
-            pool_maxsize = proxy.get('pool_max_queue_size') or 10
-            max_retries = proxy.get('pool_max_retries') or 0
-            pool_block = proxy.get('pool_block') or False
-            prefix = proxy['upstream_url']
-            self.session.mount(prefix, HTTPAdapter(
-                pool_connections=pool_connections,
-                pool_maxsize=pool_maxsize,
-                max_retries=max_retries,
-                pool_block=pool_block,
-            ))
 
     def install_tornado_urls(self):
         from blackgate.http_proxy import HTTPProxy
