@@ -12,7 +12,6 @@ with open('HISTORY.rst') as history_file:
 
 requirements = [
     'futures>=3.0.5',
-    'requests>=2.10.0',
     'tornado>=4.3',
     'PyYAML>=3.11',
 ]
