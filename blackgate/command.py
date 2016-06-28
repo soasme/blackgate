@@ -94,6 +94,7 @@ class Command(object):
         # TODO: implement cache machenism.
         circuit_beaker = self.circuit_beaker
         group_key = self.options.get('group_key')
+        executor = component.pools.get_executor(group_key)
 
         if not circuit_beaker.allow_request():
             result = self.fallback('gateway reject due to circuit beaker open.')
@@ -101,7 +102,7 @@ class Command(object):
             raise gen.Return(result)
 
         try:
-            result = yield self.async()
+            result = yield executor.submit(self.async)
             circuit_beaker.mark_success() # FIXME: this should be async, possibly network error
 
         except socket.error:
