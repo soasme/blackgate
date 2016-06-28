@@ -4,12 +4,15 @@ from __future__ import absolute_import
 
 import json
 import logging
+import socket
 from copy import deepcopy
+from urllib import urlencode
 from datetime import timedelta
 
 import requests
 from tornado import gen, queues
 from tornado.ioloop import IOLoop
+from tornado.httpclient import AsyncHTTPClient, HTTPRequest, HTTPError
 from concurrent.futures import TimeoutError
 
 from blackgate.core import component
@@ -18,18 +21,64 @@ logger = logging.getLogger(__name__)
 
 class Command(object):
 
-    __command_args__ = {
-        'group_key': 'default',
-        'command_key': None,
-        'timeout_seconds': 1,
-        'timeout_enabled': True,
-    }
+    def __init__(self, request, proxy):
+        self.proxy = proxy
+        self.request = request
+        self.response = {}
 
-    def run(self):
-        raise NotImplementedError
+    @gen.coroutine
+    def async(self):
+        client = AsyncHTTPClient()
+        self.before_request()
+        request = HTTPRequest(
+            url='%s?%s' % (self.request['url'], urlencode(self.request['params'])),
+            method=self.request['method'].upper(),
+            headers=self.request['headers'],
+            body=self.request['data'] if self.request['method'].upper() != 'GET' else None,
+            connect_timeout=self.options.get('connect_timeout_seconds'),
+            request_timeout=self.options.get('timeout_seconds'),
+        )
+        try:
+            resp = yield client.fetch(request)
+            self.response = dict(
+                status_code=resp.code,
+                reason=resp.reason,
+                headers=dict(resp.headers),
+                content=resp.body,
+            )
+        except HTTPError as error:
+            self.response = dict(
+                status_code=error.code,
+                reason=error.response.reason,
+                headers=dict(error.response.headers),
+                content=resp.response.body,
+            )
+        self.after_response()
+        raise gen.Return(self.response)
 
-    def fallback(self):
-        raise NotImplementedError
+    def fallback(self, reason=''):
+        return dict(
+            status_code=502,
+            reason='Bad Gateway',
+            headers={
+                'Content-Type': 'application/json',
+            },
+            content=json.dumps({
+                'code': 502,
+                'message': str(reason) or 'gateway is using fallback mechanism',
+                'errors': []
+            })
+        )
+
+    @property
+    def options(self):
+        return dict(
+            group_key=self.proxy['name'],
+            command_key='proxy',
+            timeout_seconds=self.proxy.get('timeout_seconds') or 30,
+            connect_timeout_seconds=self.proxy.get('connect_timeout_seconds') or 3,
+            timeout_enabled=bool(self.proxy.get('timeout_enabled')),
+       )
 
     @property
     def circuit_beaker(self):
@@ -40,45 +89,33 @@ class Command(object):
             **component.circuit_beaker_options
         )
 
-    @property
-    def options(self):
-        if hasattr(self, '_options'):
-            return self._options
-
-        args = deepcopy(Command.__command_args__)
-        args.update(self.__command_args__)
-        setattr(self, '_options', args)
-
-        return args
-
     @gen.coroutine
     def queue(self):
         # TODO: implement cache machenism.
         circuit_beaker = self.circuit_beaker
-        timeout_enabled = self.options.get('timeout_enabled')
-        timeout_seconds = self.options.get('timeout_seconds')
         group_key = self.options.get('group_key')
 
         if not circuit_beaker.allow_request():
-            result = self.fallback()
+            result = self.fallback('gateway reject due to circuit beaker open.')
             logger.error('type: circuit_beaker_reject')
             raise gen.Return(result)
 
-        executor = component.pools.get_executor(group_key)
-
         try:
-            timeout_seconds = timeout_seconds if timeout_enabled else 30 # FIXME
-            timeout = timedelta(seconds=timeout_seconds)
-            result = yield gen.with_timeout(timeout, executor.submit(self.run))
+            result = yield self.async()
             circuit_beaker.mark_success() # FIXME: this should be async, possibly network error
 
+        except socket.error:
+            result = self.fallback('gateway failed to connect upstream.')
+            circuit_beaker.mark_timeout()
+            logger.error('type: socket_error')
+
         except queues.QueueFull:
-            result = self.fallback()
+            result = self.fallback('gateway reject due to too many connections.')
             circuit_beaker.mark_reject()
             logger.error('type: pool_full')
 
         except gen.TimeoutError:
-            result = self.fallback()
+            result = self.fallback('gateway timeout on fetching upstream.')
             circuit_beaker.mark_timeout()
             logger.error('type: execution_timeout')
 
@@ -88,7 +125,8 @@ class Command(object):
             # XXX: use some error aggreation system like sentry to report errors???
             result = self.fallback()
             circuit_beaker.mark_failure()
-            logger.error('type: execution_fail, reason: %s', exception.message)
+            import traceback
+            traceback.print_exc()
 
         raise gen.Return(result)
 
@@ -96,61 +134,13 @@ class Command(object):
         try:
             return self.run()
         except Exception as exception:
-            logger.error('type: execution_fail, reason: %s', exception.message)
+            logger.error('type: execution_fail, traceback: ')
+            import traceback
+            traceback.print_tb()
             return self.fallback()
-
-
-class HTTPProxyCommand(Command):
-
-    def __init__(self, request, proxy):
-        self.proxy = proxy
-        self.request = request
-        self.response = {}
-
-    @property
-    def options(self):
-        return dict(
-            group_key=self.proxy['name'],
-            command_key='proxy',
-            timeout_seconds=self.proxy.get('timeout_seconds') or 1,
-            timeout_enabled=bool(self.proxy.get('timeout_enabled')),
-        )
 
     def before_request(self):
         return
 
     def after_response(self):
         return
-
-    def run(self):
-        session = component.session
-        self.before_request()
-        resp = session.request(
-            method=self.request['method'].upper(),
-            url=self.request['url'],
-            params=self.request['params'],
-            data=self.request['data'],
-            headers=self.request['headers'],
-        )
-        self.response = dict(
-            status_code=resp.status_code,
-            reason=resp.reason,
-            headers=dict(resp.headers),
-            content=resp.content
-        )
-        self.after_response()
-        return self.response
-
-    def fallback(self):
-        return dict(
-            status_code=502,
-            reason='Bad Gateway',
-            headers={
-                'Content-Type': 'application/json',
-            },
-            content=json.dumps({
-                'code': 500,
-                'message': 'using fallback mechanism',
-                'errors': []
-            })
-        )
