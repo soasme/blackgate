@@ -22,6 +22,7 @@ from blackgate.server import Server
 @click.pass_context
 def main(ctx, config, daemon, pidfile,
          stdin, stdout, stderr, directory, umask):
+    """Entry of Blackgate command."""
     if not config:
         config = read_default_config()
     else:
@@ -47,6 +48,7 @@ def main(ctx, config, daemon, pidfile,
 @main.command()
 @click.pass_context
 def start(ctx):
+    """Start Blackgate."""
     if ctx.obj['daemon']:
         ctx.obj['server'].start()
     else:
@@ -55,6 +57,7 @@ def start(ctx):
 @main.command()
 @click.pass_context
 def stop(ctx):
+    """Stop Blackgate."""
     server = ctx.obj['server']
     server.stop()
 
@@ -62,12 +65,14 @@ def stop(ctx):
 @main.command()
 @click.pass_context
 def restart(ctx):
+    """Restart Blackgate."""
     server = ctx.obj['server']
     server.restart()
 
 @main.command()
 @click.pass_context
 def status(ctx):
+    """Inspect Blackgate Status."""
     server = ctx.obj['server']
     server.is_running()
 
