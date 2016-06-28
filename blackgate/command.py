@@ -130,14 +130,6 @@ class Command(object):
 
         raise gen.Return(result)
 
-    def execute(self):
-        try:
-            return self.run()
-        except Exception as exception:
-            logger.error('type: execution_fail, traceback: ')
-            import traceback
-            traceback.print_tb()
-            return self.fallback()
 
     def before_request(self):
         return
