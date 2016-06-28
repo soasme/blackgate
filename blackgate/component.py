@@ -2,6 +2,7 @@
 
 from functools import partial
 
+from blackgate.http_proxy import HTTPProxy
 from blackgate.executor_pools  import ExecutorPools
 from blackgate.circuit_beaker import NoCircuitBeaker, InProcessCircuitBeaker, get_circuit_beaker
 
@@ -59,13 +60,8 @@ class Component(object):
             self.circuit_beaker_options = self.configurations.get('circuit_beaker_options') or {}
 
     def install_tornado_urls(self):
-        from blackgate.http_proxy import HTTPProxy
         from blackgate.command import Command
-
         for proxy in self.configurations.get('proxies', []):
-            route = [
-                proxy['request_path_regex'],
-                HTTPProxy,
-                dict(proxy=proxy),
-            ]
-            self.urls.append(route)
+            self.urls.append(
+                [proxy['request_path_regex'], HTTPProxy, dict(proxy=proxy),]
+            )
