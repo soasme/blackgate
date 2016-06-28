@@ -5,15 +5,11 @@ from __future__ import absolute_import
 import json
 import logging
 import socket
-from copy import deepcopy
 from urllib import urlencode
-from datetime import timedelta
 
-import requests
 from tornado import gen, queues
 from tornado.ioloop import IOLoop
 from tornado.httpclient import AsyncHTTPClient, HTTPRequest, HTTPError
-from concurrent.futures import TimeoutError
 
 from blackgate.core import component
 
