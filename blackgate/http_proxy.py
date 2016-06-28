@@ -4,13 +4,13 @@ import re
 import logging
 
 from tornado import gen, web
+from blackgate.command import Command
 
 logger = logging.getLogger(__name__)
 
 class HTTPProxy(web.RequestHandler):
 
-    def initialize(self, command, proxy):
-        self.command= command
+    def initialize(self, proxy):
         self.proxy = proxy
 
     @gen.coroutine
@@ -62,7 +62,7 @@ class HTTPProxy(web.RequestHandler):
         )
         logger.debug('request: %s' % request_data)
 
-        command = self.command(request_data, self.proxy)
+        command = Command(request_data, self.proxy)
         resp = yield command.queue()
 
         logger.debug('response: %s' % resp)
