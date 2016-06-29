@@ -22,8 +22,8 @@ class Component(object):
     def install_executor_pool(self):
         ioloop = tornado.ioloop.IOLoop.current()
         for proxy in self.configurations.get('proxies', []):
-            max_workers = proxy.get('pool_max_workers') or 10
-            self.pools.register_pool(ioloop, proxy['name'], max_workers)
+            max_size = proxy.get('pool_max_size') or 100
+            self.pools.register_pool(ioloop, proxy['name'], max_size)
 
     def install_tornado_urls(self):
         for proxy in self.configurations.get('proxies', []):
