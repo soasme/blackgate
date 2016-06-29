@@ -11,8 +11,6 @@ from tornado import gen, queues
 from tornado.ioloop import IOLoop
 from tornado.httpclient import AsyncHTTPClient, HTTPRequest, HTTPError
 
-from blackgate.core import component
-
 logger = logging.getLogger(__name__)
 
 def fallback(reason=''):
@@ -76,20 +74,7 @@ COMMAND_ERRORS = {
     gen.TimeoutError: on_gen_timeout,
 }
 
-def handle_command_error(error):
+def handle_client_error(error):
     if isinstance(error, tuple(COMMAND_ERRORS.keys())):
         return COMMAND_ERRORS[error.__class__]
     raise error
-
-@gen.coroutine
-def execute(request, options=None):
-    options = options or {}
-    group_key = options.get('name')
-    executor = component.pools.get_executor(group_key)
-
-    try:
-        submit_data = dict(request=request, options=options)
-        result = yield executor.submit(fetch, **submit_data)
-        raise gen.Return(result)
-    except Exception as exc:
-        handle_command_error(exc)
