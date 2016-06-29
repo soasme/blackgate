@@ -9,8 +9,9 @@ logger = logging.getLogger(__name__)
 
 class HTTPProxy(web.RequestHandler):
 
-    def initialize(self, proxy):
+    def initialize(self, proxy, pools):
         self.proxy = proxy
+        self.pools = pools
 
     @gen.coroutine
     def get(self, *args, **kwargs):
@@ -42,8 +43,6 @@ class HTTPProxy(web.RequestHandler):
 
     @gen.coroutine
     def _fetch(self, *args, **kwargs):
-        from blackgate.http_client import execute
-
         headers = dict(self.request.headers.get_all())
         headers.pop('Host', None)
         headers['User-Agent'] = 'Blackgate/%s' % '0.1.2'
@@ -65,7 +64,7 @@ class HTTPProxy(web.RequestHandler):
         )
 
         logger.debug('request: %s' % request_data)
-        resp = yield execute(request_data, self.proxy)
+        resp = yield self.pools.execute(request_data, self.proxy)
         logger.debug('response: %s' % resp)
 
         self.write_resp(resp)
