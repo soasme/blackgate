@@ -33,8 +33,12 @@ def fetch(request, options=None):
     """Fetch request."""
     client = AsyncHTTPClient()
     options = options or {}
+    if request['params']:
+        url = '%s?%s' % (request['url'], urlencode(request['params'], True))
+    else:
+        url = request['url']
     request = HTTPRequest(
-        url='%s?%s' % (request['url'], urlencode(request['params'])),
+        url=url,
         method=request['method'].upper(),
         headers=request['headers'],
         body=request['data'] if request['method'].upper() != 'GET' else None,
@@ -54,7 +58,7 @@ def fetch(request, options=None):
             status_code=error.code,
             reason=error.response.reason,
             headers=dict(error.response.headers),
-            content=resp.response.body,
+            content=error.response.body,
         )
     raise gen.Return(response)
 
@@ -75,6 +79,7 @@ COMMAND_ERRORS = {
 }
 
 def handle_client_error(error):
-    if isinstance(error, tuple(COMMAND_ERRORS.keys())):
-        return COMMAND_ERRORS[error.__class__]
+    for error_cls in COMMAND_ERRORS:
+        if isinstance(error, error_cls):
+            return COMMAND_ERRORS[error_cls](error)
     raise error
