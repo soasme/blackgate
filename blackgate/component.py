@@ -60,7 +60,6 @@ class Component(object):
             self.circuit_beaker_options = self.configurations.get('circuit_beaker_options') or {}
 
     def install_tornado_urls(self):
-        from blackgate.command import Command
         for proxy in self.configurations.get('proxies', []):
             self.urls.append(
                 [proxy['request_path_regex'], HTTPProxy, dict(proxy=proxy),]
