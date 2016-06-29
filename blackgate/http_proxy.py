@@ -4,7 +4,6 @@ import re
 import logging
 
 from tornado import gen, web
-from blackgate.command import Command
 
 logger = logging.getLogger(__name__)
 
@@ -43,9 +42,12 @@ class HTTPProxy(web.RequestHandler):
 
     @gen.coroutine
     def _fetch(self, *args, **kwargs):
+        from blackgate.command import queue
+
         headers = dict(self.request.headers.get_all())
         headers.pop('Host', None)
         headers['User-Agent'] = 'Blackgate/%s' % '0.1.2'
+
         path = re.sub(
             self.proxy['request_path_regex'],
             self.proxy['request_path_sub'],
@@ -53,6 +55,7 @@ class HTTPProxy(web.RequestHandler):
         )
         upstream_url = self.proxy['upstream_url']
         url = upstream_url + path
+
         request_data = dict(
             method=self.request.method,
             url=url,
@@ -60,12 +63,11 @@ class HTTPProxy(web.RequestHandler):
             data=self.request.body,
             headers=headers,
         )
+
         logger.debug('request: %s' % request_data)
-
-        command = Command(request_data, self.proxy)
-        resp = yield command.queue()
-
+        resp = yield queue(request_data, self.proxy)
         logger.debug('response: %s' % resp)
+
         self.write_resp(resp)
 
     def write_resp(self, resp):
