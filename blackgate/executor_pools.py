@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from blackgate.executor import QueueExecutor
-from tornado.ioloop import IOLoop
 
+from tornado.ioloop import IOLoop
+from tornado import gen
+from blackgate.executor import QueueExecutor
+from blackgate.http_client import fetch, handle_client_error
 
 class ExecutorPools(object):
 
@@ -19,3 +21,15 @@ class ExecutorPools(object):
         if group_key not in self.pools:
             raise Exception("Pool not registerd: %s" % group_key)
         return self.pools[group_key]
+
+    @gen.coroutine
+    def execute(self, request, options=None):
+        group_key = options.get('name')
+        executor = self.get_executor(group_key)
+        options = options or {}
+        try:
+            submit_data = dict(request=request, options=options)
+            result = yield executor.submit(fetch, **submit_data)
+            raise gen.Return(result)
+        except Exception as exc:
+            handle_client_error(exc)
