@@ -82,7 +82,7 @@ def handle_command_error(error):
     raise error
 
 @gen.coroutine
-def queue(request, options=None):
+def execute(request, options=None):
     options = options or {}
     group_key = options.get('name')
     executor = component.pools.get_executor(group_key)

@@ -42,7 +42,7 @@ class HTTPProxy(web.RequestHandler):
 
     @gen.coroutine
     def _fetch(self, *args, **kwargs):
-        from blackgate.command import queue
+        from blackgate.http_client import execute
 
         headers = dict(self.request.headers.get_all())
         headers.pop('Host', None)
@@ -65,7 +65,7 @@ class HTTPProxy(web.RequestHandler):
         )
 
         logger.debug('request: %s' % request_data)
-        resp = yield queue(request_data, self.proxy)
+        resp = yield execute(request_data, self.proxy)
         logger.debug('response: %s' % resp)
 
         self.write_resp(resp)
