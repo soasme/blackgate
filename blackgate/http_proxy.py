@@ -2,7 +2,8 @@
 
 import re
 import logging
-
+from urllib import urlencode
+from urlparse import parse_qs
 from tornado import gen, web
 
 logger = logging.getLogger(__name__)
@@ -54,11 +55,12 @@ class HTTPProxy(web.RequestHandler):
         )
         upstream_url = self.proxy['upstream_url']
         url = upstream_url + path
+        params = self.request.query_arguments
 
         request_data = dict(
             method=self.request.method,
             url=url,
-            params=self.request.query_arguments,
+            params=params,
             data=self.request.body,
             headers=headers,
         )
