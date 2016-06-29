@@ -3,6 +3,7 @@
 import os
 import click
 
+from tornado.web import Application
 from blackgate.component import Component
 from blackgate.config import parse_yaml_config
 from blackgate.config import read_yaml_config
@@ -40,8 +41,12 @@ def main(ctx, config, daemon, pidfile,
     component.configurations = config
     component.install()
 
+    server = Server(pidfile, stdin, stdout, stderr, directory, umask)
+    server.set_app(Application(component.urls))
+    server.set_port(config.get('port') or 9654)
+
     ctx.obj = {}
-    ctx.obj['server'] = Server(pidfile, stdin, stdout, stderr, directory, umask)
+    ctx.obj['server'] = server
     ctx.obj['daemon'] = daemon
 
 
