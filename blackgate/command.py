@@ -77,14 +77,14 @@ COMMAND_ERRORS = {
 }
 
 def handle_command_error(error):
-    if isinstance(error, COMMAND_ERRORS.keys()):
+    if isinstance(error, tuple(COMMAND_ERRORS.keys())):
         return COMMAND_ERRORS[error.__class__]
     raise error
 
 @gen.coroutine
 def queue(request, options=None):
     options = options or {}
-    group_key = options.get('group_key')
+    group_key = options.get('name')
     executor = component.pools.get_executor(group_key)
 
     try:
