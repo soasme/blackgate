@@ -61,6 +61,10 @@ class Component(object):
 
     def install_tornado_urls(self):
         for proxy in self.configurations.get('proxies', []):
+            data = dict(
+                proxy=proxy,
+                pools=self.pools,
+            )
             self.urls.append(
-                [proxy['request_path_regex'], HTTPProxy, dict(proxy=proxy),]
+                [proxy['request_path_regex'], HTTPProxy, data,]
             )
