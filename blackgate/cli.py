@@ -3,7 +3,7 @@
 import os
 import click
 
-from blackgate.core import component
+from blackgate.component import Component
 from blackgate.config import parse_yaml_config
 from blackgate.config import read_yaml_config
 from blackgate.config import read_default_config
@@ -36,6 +36,7 @@ def main(ctx, config, daemon, pidfile,
     except ValueError:
         ctx.fail('config is not valid yaml.')
 
+    component = Component()
     component.configurations = config
     component.install()
 
