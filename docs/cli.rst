@@ -9,7 +9,7 @@ Command: blackgate
 blackgate_options
 -------------------
 
-1. `-c /path/to/blackgate.yml`
+* `-c /path/to/blackgate.yml`
 
 Blackgate configuration file.
 
@@ -21,11 +21,43 @@ Blackgate by default search configuration file from files listed below by order.
 * `/etc/blackgate/blackgate.yml`
 
 Blackgate will fail to run without loading a yaml config file, except command `init`.
-
 This file contains configuration for upstream services, plugins, etc.
+
+* `--daemon/--no-daemon`
+
+Set Blackgate running mode.
+
+When set to `--daemon` (default), Blackgate will be executed as daemon.
+When set to `--no-daemon`, Blackgate will be executed foreground. This is useful if you
+want to use `supervisord` to manage process.
+
+* `--pidfile`
+
+Set Blackgate pidfile. Default `/var/run/blackgate.pid`.
+
+It's only available when you are running Blackgate in daemon mode.
+
+* `--stdin`
+
+Set Blackgate input. Default `/dev/null`.
+
+* `--stdout`
+
+Set Blackgate output. Default `/dev/null`.
+
+* `--stderr`
+
+Set Blackgate error. Default `/dev/null`.
+
+* `--directory`
+
+Set process working directory. Default current directory.
+
 
 command: init
 --------------
+
+TODO
 
 Create a configuration file at current directory::
 
