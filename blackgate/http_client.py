@@ -60,11 +60,16 @@ def fetch(request, options=None):
             headers=dict(error.response.headers),
             content=error.response.body,
         )
+    except socket.error:
+        response = fallback('gateway reject due to broken upstream connection.')
+    except gen.TimeoutError:
+        response = fallback('gateway reject due to timeout.')
+
     raise gen.Return(response)
 
 
 def on_socket_error(error):
-    return fallback('gateway reject due to broken upstream connection.')
+    return
 
 def on_queue_full(error):
     return fallback('gateway reject due to too many connections.')
