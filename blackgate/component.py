@@ -2,13 +2,11 @@
 
 import tornado.ioloop
 from blackgate.http_proxy import HTTPProxy
-from blackgate.executor  import ExecutorPools
 
 class Component(object):
 
     def __init__(self):
         self.urls = []
-        self.pools = ExecutorPools()
         self.configurations = {}
 
     @property
