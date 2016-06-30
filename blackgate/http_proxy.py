@@ -5,6 +5,7 @@ import logging
 from urllib import urlencode
 from urlparse import parse_qs
 from tornado import gen, web
+from blackgate.http_client import fetch
 
 logger = logging.getLogger(__name__)
 
@@ -66,7 +67,9 @@ class HTTPProxy(web.RequestHandler):
         )
 
         logger.debug('request: %s' % request_data)
-        resp = yield self.pools.execute(request_data, self.proxy)
+
+        resp = yield fetch(request_data, self.proxy)
+
         logger.debug('response: %s' % resp)
 
         self.write_resp(resp)
