@@ -66,25 +66,3 @@ def fetch(request, options=None):
         response = fallback('gateway reject due to timeout.')
 
     raise gen.Return(response)
-
-
-def on_socket_error(error):
-    return
-
-def on_queue_full(error):
-    return fallback('gateway reject due to too many connections.')
-
-def on_gen_timeout(error):
-    return fallback('gateway reject due to timeout')
-
-COMMAND_ERRORS = {
-    socket.error: on_socket_error,
-    queues.QueueFull: on_queue_full,
-    gen.TimeoutError: on_gen_timeout,
-}
-
-def handle_client_error(error):
-    for error_cls in COMMAND_ERRORS:
-        if isinstance(error, error_cls):
-            return COMMAND_ERRORS[error_cls](error)
-    raise error
