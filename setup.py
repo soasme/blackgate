@@ -23,7 +23,7 @@ test_requirements = [
 
 setup(
     name='blackgate',
-    version='0.2.2',
+    version='0.2.3',
     license='MIT',
     description="A set of utilities to build API gateway.",
     long_description=readme + '\n\n' + history,
