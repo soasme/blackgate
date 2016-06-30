@@ -33,7 +33,7 @@ setup(
     author="Ju Lin",
     author_email='soasme@gmail.com',
     url='https://github.com/soasme/blackgate',
-    packages=find_packages(),
+    packages=find_packages(exclude=('tests', 'tests.*', '*.tests', '*.tests.*', )),
     package_dir={'blackgate': 'blackgate'},
     keywords='microservices, api, gateway, server, production,',
     classifiers=[
