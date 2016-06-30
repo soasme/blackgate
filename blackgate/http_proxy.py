@@ -46,7 +46,7 @@ class HTTPProxy(web.RequestHandler):
     def _fetch(self, *args, **kwargs):
         headers = dict(self.request.headers.get_all())
         headers.pop('Host', None)
-        headers['User-Agent'] = 'Blackgate/%s' % '0.2.1'
+        headers['User-Agent'] = 'Blackgate/%s' % '0.2.2'
 
         path = re.sub(
             self.proxy['request_path_regex'],
