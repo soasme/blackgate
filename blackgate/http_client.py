@@ -54,12 +54,20 @@ def fetch(request, options=None):
             content=resp.body,
         )
     except HTTPError as error:
-        response = dict(
-            status_code=error.code,
-            reason=error.response.reason,
-            headers=dict(error.response.headers),
-            content=error.response.body,
-        )
+        if error.response:
+            response = dict(
+                status_code=error.code,
+                reason=error.response.reason,
+                headers=dict(error.response.headers),
+                content=error.response.body,
+            )
+        else:
+            response = dict(
+                status_code=error.code,
+                reason='Bad Gateway',
+                headers={},
+                content='no upstream response',
+            )
     except socket.error:
         response = fallback('gateway reject due to broken upstream connection.')
     except gen.TimeoutError:
