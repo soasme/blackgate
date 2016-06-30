@@ -11,9 +11,8 @@ logger = logging.getLogger(__name__)
 
 class HTTPProxy(web.RequestHandler):
 
-    def initialize(self, proxy, pools):
+    def initialize(self, proxy):
         self.proxy = proxy
-        self.pools = pools
 
     @gen.coroutine
     def get(self, *args, **kwargs):
