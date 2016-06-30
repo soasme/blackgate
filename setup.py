@@ -14,6 +14,7 @@ requirements = [
     'futures>=3.0.5',
     'tornado>=4.3',
     'PyYAML>=3.11',
+    'click>=6.0',
 ]
 
 test_requirements = [
