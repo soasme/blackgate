@@ -54,19 +54,6 @@ Set Blackgate error. Default `/dev/null`.
 Set process working directory. Default current directory.
 
 
-command: init
---------------
-
-TODO
-
-Create a configuration file at current directory::
-
-    $ blackgate init
-
-Create a configuration file at specific directory::
-
-    $ blackgate init -c /path/to/blackgate.yml
-
 command: start
 ---------------
 
@@ -94,14 +81,6 @@ Restart a Blackgate instance::
 
 Note: If Blackgate was not running before executing this command, it will start
 a Blackgate instance directly.
-
-
-command: reload
-----------------
-
-Reload Blackgate configuration::
-
-    $ blackgate reload
 
 
 command: status

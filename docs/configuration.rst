@@ -49,17 +49,3 @@ Required.
 `request_path_sub` is a regex sub string.
 
 Required.
-
-`pool_max_size`
-```````````````````
-
-`pool_max_size` is an integer to limit the amount of user concurrent request.
-Default 300.
-
-It is recommend to give a proper `pool_max_size` to protect upstream service.
-
-Formula::
-
-    pool_max_size = request_per_second / response_time_per_request (at peak time)
-
-Optional.
