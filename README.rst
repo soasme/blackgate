@@ -1,10 +1,13 @@
-# Blackgate
+Blackgate
+=========
 
 Blackgate is an API gateway application.  It's stateless and extendable.
 
-## Example
+Example
+--------
 
-### Configure Upstream
+Configure Upstream
+```````````````````
 
 A minimal Blackgate config looks something like this::
 
@@ -17,7 +20,8 @@ A minimal Blackgate config looks something like this::
 
 Just save it as `blackgate.yml`.
 
-### Run Application
+Run Application
+```````````````````
 
 
 Run application::
@@ -25,7 +29,8 @@ Run application::
     $ blackgate -c ./blackgate.yml start
 
 
-### Test Blackgate
+Test Blackgate
+```````````````````
 
 Using `curl` to test functionality::
 
