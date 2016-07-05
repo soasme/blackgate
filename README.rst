@@ -3,6 +3,19 @@ Blackgate
 
 Blackgate is an API gateway application.  It's stateless and extendable.
 
+Install
+--------
+
+Run::
+
+    $ pip install blackgate
+
+Or::
+
+    $ git clone git@github.com:soasme/blackgate.git
+    $ cd blackgate
+    $ python setup.py install
+
 Example
 --------
 
