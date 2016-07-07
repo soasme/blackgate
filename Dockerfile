@@ -4,6 +4,8 @@ MAINTAINER Lin Ju <soasme@gmail.com>
 
 RUN pip install blackgate==0.2.3
 
-VOLUME /etc/blackgate/blackgate.yml
+VOLUME /etc/blackgate.yml
 
-CMD blackgate --no-daemon start
+EXPOSE 9654
+
+CMD blackgate --no-daemon -c /etc/blackgate.yml start
