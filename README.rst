@@ -3,6 +3,9 @@ Blackgate
 
 Blackgate is an API gateway application.  It's stateless and extendable.
 
+![Build Status](https://travis-ci.org/soasme/blackgate.svg?branch=master)
+![Docker ImageLayers](https://badge.imagelayers.io/soasme/blackgate:latest.svg)
+
 Install via pip
 ---------------
 
