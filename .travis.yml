@@ -10,7 +10,7 @@ install:
   - virtualenv venv
   - source venv/bin/activate
   - python setup.py develop
-  - pip install py.test mock
+  - pip install pytest mock
 
 script:
   - py.test tests
