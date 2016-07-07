@@ -8,7 +8,7 @@ Install via pip
 
 Run::
 
-    $ pip install blackgate==0.2.3
+    $ pip install blackgate
 
 Or::
 
@@ -21,7 +21,7 @@ Install via docker
 
 Run::
 
-    $ docker pull blackgate:v0.2.3
+    $ docker pull soasme/blackgate
 
 
 Example
