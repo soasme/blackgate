@@ -1,0 +1,6 @@
+---
+proxies:
+  - name: github
+    upstream_url: 'https://api.github.com'
+    request_path_regex: /github/(.*)
+    request_path_sub: /\1
