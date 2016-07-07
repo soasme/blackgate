@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import json
+import socket
 
 from mock import patch, MagicMock
 from tornado.web import Application
@@ -29,14 +30,21 @@ class TestHTTPProxyFallbackDueToBrokenUpstreamConnection(AsyncHTTPTestCase):
 
 
     def test_response_socket_error(self):
-        resp = self.fetch('/upstream/this-is-from-test-case')
-        assert resp.code == 502
-        assert resp.reason == 'Bad Gateway'
-        assert resp.body == json.dumps(dict(
-            code=502,
-            message='gateway reject due to broken upstream connection.',
-            errors=[],
-        ))
+        mock_client = MagicMock()
+        @gen.coroutine
+        def _mock_fetch(request):
+            raise socket.error
+        mock_client().fetch = _mock_fetch
+
+        with patch('blackgate.http_client.AsyncHTTPClient', mock_client):
+            resp = self.fetch('/upstream/this-is-from-test-case')
+            assert resp.code == 502
+            assert resp.reason == 'Bad Gateway'
+            assert resp.body == json.dumps(dict(
+                code=502,
+                message='gateway reject due to broken upstream connection.',
+                errors=[],
+            ))
 
 class TestHTTPProxyFallbackDueToTooManyConnections(AsyncHTTPTestCase):
 
