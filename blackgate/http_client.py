@@ -43,7 +43,7 @@ def fetch(request, options=None):
         headers=request['headers'],
         body=request['data'] if request['method'].upper() != 'GET' else None,
         connect_timeout=options.get('connect_timeout_seconds'),
-        request_timeout=options.get('timeout_seconds'),
+        request_timeout=options.get('request_timeout_seconds'),
     )
     try:
         resp = yield client.fetch(request)
@@ -62,7 +62,7 @@ def fetch(request, options=None):
                 content=error.response.body,
             )
         else:
-            response = fallback('gateway reject due to no upstream response.')
+            response = fallback('gateway reject due to no upstream response, code: %s.' % error.code)
     except socket.error:
         response = fallback('gateway reject due to broken upstream connection.')
     except gen.TimeoutError:
