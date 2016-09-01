@@ -32,7 +32,7 @@ probably a better choice. The reason not using Kong is because if
 you want to start a Kong cluster, you have to run a bunch of
 dependencies in several nodes, like Nginx, PostgreSQL, etc. 
 Blackgate is much simpler in this case. Write config, and Run 
-instance. Nothing more. In early state, we can choose a simpler 
+instance. Nothing more. In early stage, we can choose a simpler 
 tool like Blackgate to avoid over-engineering.
 
 You might also want to monitor and register services to
