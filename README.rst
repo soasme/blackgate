@@ -57,7 +57,7 @@ Or via docker::
 
     $ docker run -it --rm --name blackgate \
         -p 9654:9654 \
-        -v blackgate.yml:/etc/blackgate.yml blackgate:v0.2.3
+        -v blackgate.yml:/etc/blackgate.yml blackgate:latest
 
 Test Blackgate
 ```````````````````
