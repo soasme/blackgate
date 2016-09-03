@@ -41,8 +41,10 @@ def main(ctx, config, daemon, pidfile,
     component.configurations = config
     component.install()
 
+    application = Application(component.urls)
+
     server = Server(pidfile, stdin, stdout, stderr, directory, umask)
-    server.set_app(Application(component.urls))
+    server.set_app(application)
     server.set_port(config.get('port') or 9654)
 
     ctx.obj = {}
