@@ -43,6 +43,16 @@ def main(ctx, config, daemon, pidfile,
 
     application = Application(component.urls)
 
+    # FIXME: is there a better place to put this piece of code?
+    if component.configurations.get('sentry'):
+        try:
+            from raven.contrib.tornado import AsyncSentryClient
+            dsn = component.configurations.get('sentry', {}).get('dsn')
+            if dsn:
+                application.sentry_client = AsyncSentryClient(dsn)
+        except ImportError:
+            ctx.fail('You have configured `sentry`, but `raven` library not detected. Try `pip install raven`.')
+
     server = Server(pidfile, stdin, stdout, stderr, directory, umask)
     server.set_app(application)
     server.set_port(config.get('port') or 9654)
