@@ -11,10 +11,14 @@ with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
 requirements = [
-    'futures>=3.0.5',
-    'tornado>=4.3',
-    'PyYAML>=3.11',
-    'click>=6.0',
+    'futures',
+    'tornado',
+    'PyYAML',
+    'click',
+]
+
+raven_requirements = [
+    'raven',
 ]
 
 test_requirements = [
@@ -48,6 +52,9 @@ setup(
     ],
     test_suite='tests',
     tests_require=test_requirements,
+    extras_require={
+        'raven': raven_requirements,
+    },
     entry_points={
         'console_scripts': [
             'blackgate=blackgate.cli:main'
