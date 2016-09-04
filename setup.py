@@ -15,9 +15,6 @@ requirements = [
     'tornado',
     'PyYAML',
     'click',
-]
-
-raven_requirements = [
     'raven',
 ]
 
@@ -52,9 +49,6 @@ setup(
     ],
     test_suite='tests',
     tests_require=test_requirements,
-    extras_require={
-        'raven': raven_requirements,
-    },
     entry_points={
         'console_scripts': [
             'blackgate=blackgate.cli:main'
