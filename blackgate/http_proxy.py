@@ -5,11 +5,12 @@ import logging
 from urllib import urlencode
 from urlparse import parse_qs
 from tornado import gen, web
+from raven.contrib.tornado import SentryMixin
 from blackgate.http_client import fetch
 
 logger = logging.getLogger(__name__)
 
-class HTTPProxy(web.RequestHandler):
+class HTTPProxy(web.RequestHandler, SentryMixin):
 
     def initialize(self, proxy):
         self.proxy = proxy
