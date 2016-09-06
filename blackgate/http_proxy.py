@@ -10,7 +10,7 @@ from blackgate.http_client import fetch
 
 logger = logging.getLogger(__name__)
 
-class HTTPProxy(web.RequestHandler, SentryMixin):
+class HTTPProxy(SentryMixin, web.RequestHandler):
 
     def initialize(self, proxy):
         self.proxy = proxy
