@@ -6,6 +6,18 @@ Configuration
 
 Integer. Default 9654.
 
+`sentry`
+--------
+
+Sentry configurations.
+
+`dsn`
+``````
+
+String. Copy from Sentry Dashboard.
+
+Example: 'http://fhoczvkzelftasdzbsxqnpevduvrgcqg:quufimqaxngdimrdumseikfgotqqstvm@sentry.your-inc.com/1'
+
 `proxies`
 ----------
 
