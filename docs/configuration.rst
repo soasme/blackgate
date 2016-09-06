@@ -16,7 +16,10 @@ Sentry configurations.
 
 String. Copy from Sentry Dashboard.
 
-Example: 'http://fhoczvkzelftasdzbsxqnpevduvrgcqg:quufimqaxngdimrdumseikfgotqqstvm@sentry.your-inc.com/1'
+Example::
+
+    sentry:
+        dsn: http://fhoczvkzelftasdzbsxqnpevduvrgcqg:quufimqaxngdimrdumseikfgotqqstvm@sentry.your-inc.com/1
 
 `proxies`
 ----------
