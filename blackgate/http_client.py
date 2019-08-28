@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from __future__ import absolute_import
 
 import json
 import logging
 import socket
-from urllib import urlencode
+from urllib.parse import urlencode
 
 from tornado import gen, queues
 from tornado.ioloop import IOLoop
