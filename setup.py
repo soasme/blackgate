@@ -11,7 +11,6 @@ with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
 requirements = [
-    'futures>=3.3.0',
     'tornado<6.0',
     'PyYAML>=5.1.2',
     'click>=5.0',
