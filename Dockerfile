@@ -2,7 +2,7 @@ FROM python:3.6-slim
 
 MAINTAINER Lin Ju <soasme@gmail.com>
 
-RUN pip install blackgate==0.2.6
+RUN pip install blackgate==0.3.0
 
 VOLUME /etc/blackgate.yml
 
