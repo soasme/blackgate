@@ -40,7 +40,7 @@ class TestHTTPProxyFallbackDueToBrokenUpstreamConnection(AsyncHTTPTestCase):
             resp = self.fetch('/upstream/this-is-from-test-case')
             assert resp.code == 502
             assert resp.reason == 'Bad Gateway'
-            assert resp.body == json.dumps(dict(
+            assert resp.body.decode('utf-8') == json.dumps(dict(
                 code=502,
                 message='gateway reject due to broken upstream connection.',
                 errors=[],
