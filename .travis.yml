@@ -13,7 +13,7 @@ install:
   - pip install pytest mock
 
 script:
-  - venv/bin/py.test tests
+  - py.test tests
   - docker build -t $DOCKER_IMAGE_NAME .
   - if [ ! -z "$TRAVIS_TAG" ]; then docker tag $DOCKER_IMAGE_NAME:latest $DOCKER_IMAGE_NAME:$TRAVIS_TAG; fi && docker push $DOCKER_IMAGE_NAME
 
