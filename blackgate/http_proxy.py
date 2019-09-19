@@ -2,8 +2,8 @@
 
 import re
 import logging
-from urllib import urlencode
-from urlparse import parse_qs
+from urllib.parse import urlencode
+from urllib.parse import parse_qs
 from tornado import gen, web
 from raven.contrib.tornado import SentryMixin
 from blackgate.http_client import fetch

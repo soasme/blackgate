@@ -19,7 +19,7 @@ from blackgate.server import Server
 @click.option('--stdout', default=os.devnull)
 @click.option('--stderr', default=os.devnull)
 @click.option('--directory', default='.')
-@click.option('--umask', type=int, default=022)
+@click.option('--umask', type=int, default=22)
 @click.pass_context
 def main(ctx, config, daemon, pidfile,
          stdin, stdout, stderr, directory, umask):
