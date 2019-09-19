@@ -58,7 +58,7 @@ Run application::
     # or run via docker
     $ docker run -it --rm --name blackgate \
         -p 9654:9654 \
-        -v blackgate.yml:/etc/blackgate.yml blackgate:latest
+        -v `pwd`:/etc/blackgate/blackgate.yml blackgate:latest
 
 Test Blackgate
 ```````````````````
