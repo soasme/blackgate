@@ -23,9 +23,9 @@ test_requirements = [
 
 setup(
     name='blackgate',
-    version='0.2.6',
+    version='0.3.0',
     license='MIT',
-    description="A set of utilities to build API gateway.",
+    description="Blackgate is an API gateway application.",
     long_description=readme + '\n\n' + history,
     zip_safe=False,
     include_package_data=True,
@@ -43,8 +43,8 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
-        "Programming Language :: Python :: 2",
-        'Programming Language :: Python :: 2.7',
+        "Programming Language :: Python :: 3",
+        'Programming Language :: Python :: 3.6',
     ],
     test_suite='tests',
     tests_require=test_requirements,

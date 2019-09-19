@@ -18,7 +18,7 @@ def verify_proxies(conf):
 def parse_yaml_config(config):
     """Parse config from string in YAML format to dict."""
     try:
-        return yaml.load(config)
+        return yaml.safe_load(config)
     except ValueError:
         raise InvalidConfig('Broken YAML config.')
 
