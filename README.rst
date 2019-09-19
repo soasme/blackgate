@@ -48,14 +48,14 @@ Just save it as `blackgate.yml`.
 Run Application
 ```````````````````
 
-
 Run application::
 
-    $ blackgate -c ./blackgate.yml start
+    $ blackgate -c ./blackgate.yml --no-daemon start
 
+    # or run as a daemon
+    $ blackgate -c ./blackgate.yml --pidfile=/tmp/blackgate.pid start
 
-Or via docker::
-
+    # or run via docker
     $ docker run -it --rm --name blackgate \
         -p 9654:9654 \
         -v blackgate.yml:/etc/blackgate.yml blackgate:latest
