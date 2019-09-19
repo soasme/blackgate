@@ -11,10 +11,10 @@ with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
 requirements = [
-    'tornado',
-    'PyYAML',
-    'click',
-    'raven',
+    'tornado<6.0',
+    'PyYAML>=5.1.2',
+    'click>=5.0',
+    'raven>=6.10',
 ]
 
 test_requirements = [

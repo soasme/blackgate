@@ -4,9 +4,11 @@ services:
   - docker
 
 language: python
+python:
+  - "2.7.13"
 
 install:
-  - docker login --email=$DOCKER_HUB_EMAIL --username=$DOCKER_HUB_USERNAME --password=$DOCKER_HUB_PASSWORD
+  - docker login --username=$DOCKER_HUB_USERNAME --password=$DOCKER_HUB_PASSWORD
   - virtualenv venv
   - source venv/bin/activate
   - python setup.py develop
